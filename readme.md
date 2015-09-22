@@ -18,7 +18,9 @@ $modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config);
 Call the modify method, passing input & a \Illuminate\Database\Eloquent\Builder instance.
 ```
 $product = new Product();
-$modifier->modify($product->newQuery(), Input::all());
+$builder = $product->newQuery();
+$modifier->modify($builder, Input::all());
+$results = $product->get();
 ```
 
 ##Natively supports the following filters/modifiers
