@@ -5,7 +5,29 @@ to extend this further by adding your own modifiers that implement the 'QBModifi
 This is an early version (pre 1.0) so use at your own risk. Also, future updates are likely to include a search modifier.
 
 ## Compatibility
-Laravel 5+
+PHP          5.4+
+Laravel      5+
+
+## Installation
+Currently the package is only available via Git, although it will be added to Packagist in future. To install via composer, follow
+the steps below.
+
+Add the repo to your composer.json
+```
+"repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/johnrich85/EloquentQueryModifier"
+    }
+  ]
+```
+
+Add the package to your composer.json
+```
+"require": [
+    "johnrich85/EloquentQueryModifier/": "dev-master"
+  ]
+```
 
 ##Usage
 
@@ -30,13 +52,13 @@ $results = $product->get();
 ```
 
 ##Natively supports the following filters/modifiers
-*Sort:* ?sort=-priority,created_at
+**Sort:** ?sort=-priority,created_at
 
-*Field Filter:* ?fieldName=value
+**Field Filter:** ?fieldName=value
 
-*General Search:* ?q=search term
+**General Search:** ?q=search term
 
-*Field selection:* ?fields=id,name, description
+**Field selection:** ?fields=id,name, description
 
-*Pretty print:* ?pretty=true
+**Pretty print:** ?pretty=true
 

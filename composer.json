@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Johnrich85\\EloquentQueryModifier": "src/"
+            "Johnrich85\\EloquentQueryModifier\\": "src/"
         }
     },
     "minimum-stability": "stable"
