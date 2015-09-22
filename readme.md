@@ -1,9 +1,15 @@
 ## Details
-Automatically generates filters for common Query String parameters such as sort, order, field selection etc.
+A wrapper for common Eloquent Query-builder usage. Supports Field selection, paging, key-value filtering & sorting. It is possible
+to extend this further by adding your own modifiers that implement the 'QBModifier' interface.
 
-Currently supports Laravel 5+ only.
+This is an early version (pre 1.0) so use at your own risk. Also, future updates are likely to include a search modifier.
+
+## Compatibility
+Laravel 5+
 
 ##Usage
+
+In a nut-shell, you simply pass Input:all() to the modifier & it handles the rest. Code example provided below:
 
 Instantiate config:
 ```
