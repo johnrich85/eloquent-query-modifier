@@ -2,7 +2,6 @@
 
 class FieldSelectionModifier extends BaseModifier {
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Exception
@@ -29,6 +28,7 @@ class FieldSelectionModifier extends BaseModifier {
      * exception if found.
      *
      * @param $fields
+     * @return bool
      * @throws \Exception
      */
     protected function checkForInvalidFields($fields) {

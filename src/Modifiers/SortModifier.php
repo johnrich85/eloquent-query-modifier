@@ -25,7 +25,6 @@ class SortModifier extends BaseModifier {
      * @throws \Exception
      */
     public function modify() {
-
         $this->sortString = $this->fetchValuesFromData();
 
         if($this->sortString === false) {

@@ -56,7 +56,6 @@ class EloquentQueryModifier implements QueryModifier {
      * @param array $modifiers
      */
     protected function callModifiers(array $modifiers) {
-
         $context = array(
             'input' => $this->input,
             'builder' => $this->builder,

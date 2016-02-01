@@ -145,11 +145,14 @@ class InputConfig {
     public function setFilterableFields(\Illuminate\Database\Eloquent\Builder $builder)
     {
         $table = $builder->getModel()->getTable();
-        $columns = DB::select(DB::raw('SHOW COLUMNS FROM ' . $table));
-        $fields = array();
+
+        $columns = DB::select(
+            DB::raw('SHOW COLUMNS FROM ' . $table)
+        );
 
         foreach($columns as $col){
-            $this->filterableFields[$col->Field] = $col->Field;
+            $field = $col->Field;
+            $this->filterableFields[$field] = $field;
         }
     }
 }

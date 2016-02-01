@@ -20,14 +20,12 @@ class PagingModifier extends BaseModifier {
      * @throws \Exception
      */
     public function modify() {
-
         $this->pageNum = $this->fetchValuesFromData();
 
         if($this->pageNum === false) {
             return $this->builder;
         }
         else if($this->pageNum == '') {
-
             $this->throwNoDataException();
         }
 
@@ -45,7 +43,9 @@ class PagingModifier extends BaseModifier {
 
         $offset = ($this->pageNum - 1) * $this->perPage;
 
-        $this->builder = $this->builder->take($this->perPage)->skip($offset);
+        $this->builder = $this->builder
+            ->take($this->perPage)
+            ->skip($offset);
 
         return $this->builder;
     }

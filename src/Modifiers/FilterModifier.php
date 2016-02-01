@@ -21,7 +21,8 @@ class FilterModifier extends BaseModifier {
         }
 
         foreach($fields as $field) {
-            if(empty($this->data[$field])) continue;
+            if(empty($this->data[$field]))
+                continue;
 
             $data = $this->data[$field];
 
