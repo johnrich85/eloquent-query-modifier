@@ -17,6 +17,5 @@
     "psr-4": {
       "Johnrich85\\EloquentQueryModifier\\": "src/"
     }
-  },
-  "minimum-stability": "stable"
+  }
 }
