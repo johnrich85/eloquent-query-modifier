@@ -17,7 +17,7 @@ Add the repo to your composer.json
 "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/johnrich85/EloquentQueryModifier"
+      "url": "https://github.com/johnrich85/eloquent-query-modifier"
     }
   ]
 ```
@@ -25,7 +25,7 @@ Add the repo to your composer.json
 Add the package to your composer.json
 ```
 "require": [
-    "johnrich85/EloquentQueryModifier/": "dev-master"
+    "johnrich85/eloquent-query-modifier/": "dev-master"
   ]
 ```
 
