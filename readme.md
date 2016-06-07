@@ -2,8 +2,6 @@
 A wrapper for common Eloquent Query-builder usage. Supports Field selection, paging, key-value filtering & sorting. It is possible
 to extend this further by adding your own modifiers that implement the 'QBModifier' interface.
 
-This is an early version (pre 1.0) so use at your own risk. Also, future updates are likely to include a search modifier.
-
 ## Compatibility
 PHP          5.4+
 Laravel      5+
@@ -25,7 +23,7 @@ Add the repo to your composer.json
 Add the package to your composer.json
 ```
 "require": [
-    "johnrich85/eloquent-query-modifier/": "dev-master"
+    "johnrich85/eloquent-query-modifier/": "^1.01"
   ]
 ```
 
@@ -56,9 +54,11 @@ $results = $product->get();
 
 **Field Filter:** ?fieldName=value
 
-**General Search:** ?q=search term
-
 **Field selection:** ?fields=id,name, description
 
 **Pretty print:** ?pretty=true
+
+##Coming soon
+
+1. Basic Search: ?q=search term
 
