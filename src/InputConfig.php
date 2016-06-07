@@ -146,13 +146,10 @@ class InputConfig {
     {
         $table = $builder->getModel()->getTable();
 
-        $columns = DB::select(
-            DB::raw('SHOW COLUMNS FROM ' . $table)
-        );
+        $columns = DB::getSchemaBuilder()->getColumnListing($table);
 
-        foreach($columns as $col){
-            $field = $col->Field;
-            $this->filterableFields[$field] = $field;
+        foreach ($columns as $col) {
+            $this->filterableFields[$col] = $col;
         }
     }
 }
