@@ -31,14 +31,15 @@ Add the package to your composer.json
 
 In a nut-shell, you simply pass Input:all() to the modifier & it handles the rest. Code example provided below:
 
-Instantiate config:
+Instantiate config and factory.
 ```
 $config = new Johnrich85\EloquentQueryModifier\InputConfig();
+$factory = new Johnrich85\EloquentQueryModifier\Factory\ModifierFactory();
 ```
 
 Instantiate Modifier:
 ```
-$modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config);
+$modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config, $factory);
 ```
 
 Call the modify method, passing input & a \Illuminate\Database\Eloquent\Builder instance.
