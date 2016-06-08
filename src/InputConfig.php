@@ -41,6 +41,11 @@ class InputConfig {
     protected $page = 'page';
 
     /**
+     * @var string
+     */
+    protected $filterType = 'andWhere';
+
+    /**
      * List of supported modifier objects.
      *
      * @var array
@@ -137,6 +142,22 @@ class InputConfig {
      */
     public function addModifier($modifierName) {
         $this->modifiers[] = $modifierName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilterType()
+    {
+        return $this->filterType;
+    }
+
+    /**
+     * @param string $filterType
+     */
+    public function setFilterType($filterType)
+    {
+        $this->filterType = $filterType;
     }
 
     /**
