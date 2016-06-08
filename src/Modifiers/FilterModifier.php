@@ -1,7 +1,7 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
-class FilterModifier extends BaseModifier {
-
+class FilterModifier extends BaseModifier
+{
     /**
      * The type of filter that will be applied.
      * @var string
@@ -11,22 +11,28 @@ class FilterModifier extends BaseModifier {
     /**
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function modify() {
+    public function modify()
+    {
         $fields = $this->getFilterableFields();
 
-        if($fields === false) {
+        $this->filterType = $this->config->getFilterType();
+
+        if ($fields === false) {
             return $this->builder;
-        }else if($fields == '') {
-            $this->throwNoDataException();
+        } else {
+            if ($fields == '') {
+                $this->throwNoDataException();
+            }
         }
 
-        foreach($fields as $field) {
-            if(empty($this->data[$field]))
+        foreach ($fields as $field) {
+            if (empty($this->data[$field])) {
                 continue;
+            }
 
             $data = $this->data[$field];
 
-            if(is_array($data)) {
+            if (is_array($data)) {
                 $this->addWhereFilters($field, $data);
                 continue;
             }
@@ -43,10 +49,11 @@ class FilterModifier extends BaseModifier {
      *
      * @return array|bool
      */
-    protected function getFilterableFields() {
+    protected function getFilterableFields()
+    {
         $fields = $this->config->getFilterableFields();
 
-        if(count($fields) == 0) {
+        if (count($fields) == 0) {
             return false;
         }
 
@@ -54,18 +61,15 @@ class FilterModifier extends BaseModifier {
     }
 
     /**
-     * Adds a where filter on first call, adds
-     * an orWhere filter thereafter.
-     *
-     * @param $field String
-     * @param $value String
+     * @param $field
+     * @param $value
      */
-    protected function addWhereFilter($field, $value) {
-        if($this->filterType == 'orWhere') {
+    protected function addWhereFilter($field, $value)
+    {
+        if ($this->filterType == 'orWhere') {
             $this->builder = $this->builder->orWhere($field, $value);
-        }else {
+        } else {
             $this->builder = $this->builder->where($field, $value);
-            $this->filterType = 'orWhere';
         }
     }
 
@@ -76,8 +80,9 @@ class FilterModifier extends BaseModifier {
      * @param $field
      * @param array $data
      */
-    protected function addWhereFilters($field, array $data) {
-        foreach($data as $fieldValue) {
+    protected function addWhereFilters($field, array $data)
+    {
+        foreach ($data as $fieldValue) {
             $this->addWhereFilter($field, $fieldValue);
         }
     }
