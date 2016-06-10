@@ -2,11 +2,12 @@
 A wrapper for common Eloquent Query-builder usage. Supports Field selection, paging, key-value filtering & sorting. It is possible
 to extend this further by adding your own modifiers that implement the 'QBModifier' interface.
 
-This is an early version (pre 1.0) so use at your own risk. Also, future updates are likely to include a search modifier.
-
 ## Compatibility
 PHP          5.4+
-Laravel      5+
+
+Laravel      5.0-5.1 (Use version 1.04. **Please note:** does not support free text search)
+
+Laravel      5.2+ (Use latest version)
 
 ## Installation
 Currently the package is only available via Git, although it will be added to Packagist in future. To install via composer, follow
@@ -25,7 +26,7 @@ Add the repo to your composer.json
 Add the package to your composer.json
 ```
 "require": [
-    "johnrich85/eloquent-query-modifier/": "dev-master"
+    "johnrich85/eloquent-query-modifier/": "^1.01"
   ]
 ```
 
@@ -33,14 +34,15 @@ Add the package to your composer.json
 
 In a nut-shell, you simply pass Input:all() to the modifier & it handles the rest. Code example provided below:
 
-Instantiate config:
+Instantiate config and factory.
 ```
 $config = new Johnrich85\EloquentQueryModifier\InputConfig();
+$factory = new Johnrich85\EloquentQueryModifier\Factory\ModifierFactory();
 ```
 
 Instantiate Modifier:
 ```
-$modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config);
+$modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config, $factory);
 ```
 
 Call the modify method, passing input & a \Illuminate\Database\Eloquent\Builder instance.
@@ -56,9 +58,11 @@ $results = $product->get();
 
 **Field Filter:** ?fieldName=value
 
-**General Search:** ?q=search term
-
 **Field selection:** ?fields=id,name, description
 
 **Pretty print:** ?pretty=true
+
+##Coming soon
+
+1. Basic Search: ?q=search term
 
