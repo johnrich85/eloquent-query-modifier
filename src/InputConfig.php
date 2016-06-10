@@ -41,6 +41,11 @@ class InputConfig {
     protected $page = 'page';
 
     /**
+     * @var string
+     */
+    protected $filterType = 'andWhere';
+
+    /**
      * List of supported modifier objects.
      *
      * @var array
@@ -140,19 +145,32 @@ class InputConfig {
     }
 
     /**
+     * @return string
+     */
+    public function getFilterType()
+    {
+        return $this->filterType;
+    }
+
+    /**
+     * @param string $filterType
+     */
+    public function setFilterType($filterType)
+    {
+        $this->filterType = $filterType;
+    }
+
+    /**
      * @param array $filterableFields
      */
     public function setFilterableFields(\Illuminate\Database\Eloquent\Builder $builder)
     {
         $table = $builder->getModel()->getTable();
 
-        $columns = DB::select(
-            DB::raw('SHOW COLUMNS FROM ' . $table)
-        );
+        $columns = DB::getSchemaBuilder()->getColumnListing($table);
 
-        foreach($columns as $col){
-            $field = $col->Field;
-            $this->filterableFields[$field] = $field;
+        foreach ($columns as $col) {
+            $this->filterableFields[$col] = $col;
         }
     }
 }
