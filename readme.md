@@ -1,11 +1,10 @@
 ## Details
-A wrapper for common Eloquent Query-builder usage. Supports Field selection, paging, key-value filtering & sorting. It is possible
-to extend this further by adding your own modifiers that implement the 'QBModifier' interface.
+A wrapper for common Eloquent Query-builder usage. Supports Field selection, paging, key-value filtering, search & sorting. It is possibleto extend this further by adding your own modifiers that implement the 'QBModifier' interface.
 
 ## Compatibility
 PHP          5.4+
 
-Laravel      5.0-5.1 (Use version 1.04. **Please note:** does not support free text search)
+Laravel      5.0 - 5.1 (Use version 1.04. **Please note:** does not support free text search)
 
 Laravel      5.2+ (Use latest version)
 
@@ -53,6 +52,27 @@ $modifier->modify($builder, Input::all());
 $results = $product->get();
 ```
 
+## Enabling search on your models.
+
+This search functionality provided by this package is dependent on 'jarektkaczyk/eloquence'. In a nutshell, to enable search on your models, you need to implement the Eloquence trait as explained on the page below.
+
+https://github.com/jarektkaczyk/eloquence/wiki/Builder-searchable-and-more#searchable
+
+** If you do not implement the Trait & attempt to use the search parameter ('q' by default) an exception will be thrown.
+
+## Disabling search on your models.
+
+You can disable the search facility altogther by removing the modifier from the config. An example has been included below.
+
+```
+$config = new Johnrich85\EloquentQueryModifier\InputConfig();
+$config->removeModifier('\Johnrich85\EloquentQueryModifier\Modifiers\SearchModifier');
+
+$factory = new Johnrich85\EloquentQueryModifier\Factory\ModifierFactory();
+
+$modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config, $factory);
+```
+
 ##Natively supports the following filters/modifiers
 **Sort:** ?sort=-priority,created_at
 
@@ -62,7 +82,5 @@ $results = $product->get();
 
 **Pretty print:** ?pretty=true
 
-##Coming soon
-
-1. Basic Search: ?q=search term
+**Basic Search:** ?q=search term
 
