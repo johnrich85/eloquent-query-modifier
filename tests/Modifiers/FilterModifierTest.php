@@ -2,29 +2,32 @@
 use Johnrich85\EloquentQueryModifier\Modifiers\FilterModifier;
 use Illuminate\Support\Facades\DB;
 
-class FilterModifierTest extends Johnrich85\Tests\BaseTest {
+class FilterModifierTest extends Johnrich85\Tests\BaseTest
+{
 
     protected $testClass = '\Johnrich85\EloquentQueryModifier\Modifiers\FilterModifier';
 
-   public function testGetFilterableFields() {
-       $modifier = $this->_getInstance();
+    public function testGetFilterableFields()
+    {
+        $modifier = $this->_getInstance();
 
-       $fields = array(
-           'name' => 'name',
-           'description' => 'description'
-       );
+        $fields = array(
+            'name' => 'name',
+            'description' => 'description'
+        );
 
-       $this->config->expects($this->any())
-           ->method('getFilterableFields')
-           ->will($this->returnValue($fields));
+        $this->config->expects($this->any())
+            ->method('getFilterableFields')
+            ->will($this->returnValue($fields));
 
-       $method = $this->getMethod('getFilterableFields');
-       $result = $method->invokeArgs($modifier, array());
+        $method = $this->getMethod('getFilterableFields');
+        $result = $method->invokeArgs($modifier, array());
 
-       $this->assertEquals($result,$fields);
-   }
+        $this->assertEquals($result, $fields);
+    }
 
-    public function testGetFilterableFieldsReturnsFalse() {
+    public function testGetFilterableFieldsReturnsFalse()
+    {
         $modifier = $this->_getInstance();
 
         $fields = array();
@@ -36,33 +39,11 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest {
         $method = $this->getMethod('getFilterableFields');
         $result = $method->invokeArgs($modifier, array());
 
-        $this->assertEquals(false,$result);
+        $this->assertEquals(false, $result);
     }
-
-    public function testAddWhereFilter() {
-        $modifier = $this->_getInstance();
-
-        $this->builder->expects($this->atLeastOnce())
-            ->method('where')
-            ->with($this->equalTo('name'),$this->equalTo('test'));
-
-        $method = $this->getMethod('addWhereFilter');
-        $method->invokeArgs($modifier, array('name', 'test'));
-    }
-
-    public function testAddWhereFilterOr() {
-        $modifier = $this->_getInstance();
-        $modifier->setFilterType('orWhere');
-
-        $this->builder->expects($this->atLeastOnce())
-            ->method('orWhere')
-            ->with($this->equalTo('name'),$this->equalTo('test'));
-
-        $method = $this->getMethod('addWhereFilter');
-        $method->invokeArgs($modifier, array('name', 'test'));
-    }
-
-    public function testModify() {
+    
+    public function testModify()
+    {
         $modifier = $this->_getInstance();
 
         $data = array(
@@ -74,20 +55,47 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest {
             ->method('getFilterableFields')
             ->will($this->returnValue($data));
 
-        $this->builder->expects($this->atLeastOnce())
+        $this->builder->expects($this->at(0))
             ->method('where')
-            ->with($this->equalTo('name'),$this->equalTo('test'))
+            ->with($this->equalTo('name'), $this->equalTo('test'))
             ->will($this->returnValue($this->builder));
 
-        $this->builder->expects($this->atLeastOnce())
-            ->method('orWhere')
-            ->with($this->equalTo('description'),$this->equalTo('test'))
+        $this->builder->expects($this->at(1))
+            ->method('where')
+            ->with($this->equalTo('description'), $this->equalTo('test'))
             ->will($this->returnValue($this->builder));
 
         $modifier->modify();
     }
 
-    public function testModifyReturnsBuilder() {
+    public function testModifyUsingOr()
+    {
+        $modifier = $this->_getInstance('or');
+
+        $data = array(
+            'name' => 'name',
+            'description' => 'description'
+        );
+
+        $this->config->expects($this->any())
+            ->method('getFilterableFields')
+            ->will($this->returnValue($data));
+
+        $this->builder->expects($this->once())
+            ->method('where')
+            ->with($this->equalTo('name'), $this->equalTo('test'))
+            ->will($this->returnValue($this->builder));
+
+        $this->builder->expects($this->once())
+            ->method('orWhere')
+            ->with($this->equalTo('description'), $this->equalTo('test'))
+            ->will($this->returnValue($this->builder));
+
+        $modifier->modify();
+    }
+
+    public function testModifyReturnsBuilder()
+    {
         $modifier = $this->_getInstance();
 
         $this->config->expects($this->any())
@@ -99,7 +107,8 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals($this->builder, $result);
     }
 
-    public function testModifyThrowsException() {
+    public function testModifyThrowsException()
+    {
         $modifier = $this->_getInstance();
 
         $this->config->expects($this->any())
@@ -111,12 +120,21 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest {
         $modifier->modify();
     }
 
-    protected function _getInstance() {
+    protected function _getInstance($type = 'and')
+    {
         $this->data = array(
             'name' => 'test',
             'description' => 'test'
         );
-        $this->config = $this->getMock('\Johnrich85\EloquentQueryModifier\InputConfig');
+
+        $this->config = $this->getMock('\Johnrich85\EloquentQueryModifier\InputConfig',
+            ['setFilterableFields', 'getFilterableFields']);
+
+
+        if ($type == 'or') {
+            $this->config->setFilterType('orWhere');
+        }
+
         $this->builder = $this->getMockBuilder('\Illuminate\Database\Eloquent\Builder')
             ->disableOriginalConstructor()
             ->getMock();

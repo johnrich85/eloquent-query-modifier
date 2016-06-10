@@ -62,7 +62,7 @@ class EloquentQueryModifier implements QueryModifier {
             'config' => $this->config
         );
 
-        foreach($modifiers as $modifier) {
+        foreach ($modifiers as $modifier) {
             $instance = $this->factory->getInstance($modifier, $context);
             $this->builder = $instance->modify();
         }

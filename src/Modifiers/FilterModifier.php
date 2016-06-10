@@ -1,5 +1,7 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
+use Johnrich85\EloquentQueryModifier\InputConfig;
+
 class FilterModifier extends BaseModifier
 {
     /**
@@ -9,13 +11,28 @@ class FilterModifier extends BaseModifier
     protected $filterType = 'where';
 
     /**
+     * @var bool
+     */
+    protected $first = true;
+
+    /**
+     * FilterModifier constructor.
+     * @param array $data
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param InputConfig $config
+     */
+    public function __construct(array $data, \Illuminate\Database\Eloquent\Builder $builder, InputConfig $config) {
+        parent::__construct($data, $builder, $config);
+
+        $this->filterType = $this->config->getFilterType();
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function modify()
     {
         $fields = $this->getFilterableFields();
-
-        $this->filterType = $this->config->getFilterType();
 
         if ($fields === false) {
             return $this->builder;
@@ -66,10 +83,11 @@ class FilterModifier extends BaseModifier
      */
     protected function addWhereFilter($field, $value)
     {
-        if ($this->filterType == 'orWhere') {
+        if ($this->filterType == 'orWhere' && !$this->first) {
             $this->builder = $this->builder->orWhere($field, $value);
         } else {
             $this->builder = $this->builder->where($field, $value);
+            $this->first = false;
         }
     }
 

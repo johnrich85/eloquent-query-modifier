@@ -34,6 +34,20 @@ class InputConfig {
     protected $limit = 'limit';
 
     /**
+     * The name of the search parameter.
+     *
+     * @var string
+     */
+    protected $search = 'q';
+
+    /**
+     * The mode of search.
+     *
+     * @var string[wildcard|literal]
+     */
+    protected $searchMode = 'wildcard';
+
+    /**
      * The name of the page parameter.
      *
      * @var string
@@ -54,7 +68,8 @@ class InputConfig {
         '\Johnrich85\EloquentQueryModifier\Modifiers\FieldSelectionModifier',
         '\Johnrich85\EloquentQueryModifier\Modifiers\FilterModifier',
         '\Johnrich85\EloquentQueryModifier\Modifiers\SortModifier',
-        '\Johnrich85\EloquentQueryModifier\Modifiers\PagingModifier'
+        '\Johnrich85\EloquentQueryModifier\Modifiers\PagingModifier',
+        '\Johnrich85\EloquentQueryModifier\Modifiers\SearchModifier'
     );
 
     /**
@@ -145,6 +160,21 @@ class InputConfig {
     }
 
     /**
+     * @param $modifierName
+     */
+    public function removeModifier($modifierName) {
+        $key = array_search($modifierName, $this->modifiers);
+
+        if ($key !== false) {
+            unset($this->modifiers[$key]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function getFilterType()
@@ -158,6 +188,38 @@ class InputConfig {
     public function setFilterType($filterType)
     {
         $this->filterType = $filterType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSearch()
+    {
+        return $this->search;
+    }
+
+    /**
+     * @param string $search
+     */
+    public function setSearch($search)
+    {
+        $this->search = $search;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSearchMode()
+    {
+        return $this->searchMode;
+    }
+
+    /**
+     * @param string $searchMode
+     */
+    public function setSearchMode($searchMode)
+    {
+        $this->searchMode = $searchMode;
     }
 
     /**

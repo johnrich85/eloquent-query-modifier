@@ -54,6 +54,10 @@ abstract class BaseModifier implements QBModifier {
     protected function throwInvalidFieldException($field)  {
         throw new \Exception('Query string parameter contains an invalid field: ' . $field);
     }
+
+    protected function throwSearchNotSupportedException($class)  {
+        throw new \Exception($class . " does not support search. To enable search for this model implement the 'Sofa\Eloquence\Eloquence' trait.");
+    }
 }
 
 interface QBModifier {
