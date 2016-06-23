@@ -21,10 +21,10 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
             'name',
             'description'
         );
-        $method = $this->getMethod('checkForInvalidFields');
+        $method = $this->getMethod('getValidFields');
         $result = $method->invokeArgs($modifier, array($fields));
 
-        $this->assertEquals(false, $result);
+        $this->assertEquals($fields, $result);
     }
 
     public function testCheckForInvalidFieldsThrowsException() {
@@ -45,8 +45,35 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
 
         $this->setExpectedException('Exception');
 
-        $method = $this->getMethod('checkForInvalidFields');
+        $method = $this->getMethod('getValidFields');
         $method->invokeArgs($modifier, array($fields));
+    }
+
+    public function testUnfoundFieldsWorkWhenUsingEagerLoading() {
+        $modifier = $this->_getInstance();
+
+        $this->builder->expects($this->any())
+            ->method('getEagerLoads')
+            ->will($this->returnValue([1]));
+
+        $this->config->expects($this->any())
+            ->method('getFilterableFields')
+            ->will($this->returnValue(array(
+                    'name' => 'name',
+                    'description' => 'description'
+                )
+            ));
+
+        $fields = array(
+            'name',
+            'invalidField'
+        );
+
+
+        $method = $this->getMethod('getValidFields');
+        $result = $method->invokeArgs($modifier, array($fields));
+
+        $this->assertEquals(array('name'), $result);
     }
 
     public function testFetchValuesFromData() {

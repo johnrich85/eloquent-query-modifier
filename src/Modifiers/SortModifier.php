@@ -1,6 +1,7 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
-class SortModifier extends BaseModifier {
+class SortModifier extends BaseModifier
+{
 
     /**
      * Sort order.
@@ -24,14 +25,16 @@ class SortModifier extends BaseModifier {
      * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Exception
      */
-    public function modify() {
+    public function modify()
+    {
         $this->sortString = $this->fetchValuesFromData();
 
-        if($this->sortString === false) {
+        if ($this->sortString === false) {
             return $this->builder;
-        }
-        else if($this->sortString == '') {
-            $this->throwNoDataException();
+        } else {
+            if ($this->sortString == '') {
+                $this->throwNoDataException();
+            }
         }
 
         $this->parseSortOrder();
@@ -44,13 +47,28 @@ class SortModifier extends BaseModifier {
      * query string.
      *
      */
-    protected function parseSortOrder() {
-        $firstChar = substr($this->sortString,0,1);
+    protected function parseSortOrder()
+    {
+        $firstChar = substr($this->sortString, 0, 1);
+
         $this->order = $this->symbolToOrder($firstChar);
 
-        if($firstChar == '-' || $firstChar == '+') {
-            $this->sortString = substr($this->sortString, 1);
+        $this->sortString = $this->removeOrderingFromField($this->sortString);
+    }
+
+    /**
+     * @param $field
+     * @return mixed
+     */
+    protected function removeOrderingFromField($field)
+    {
+        $firstChar = substr($field, 0, 1);
+
+        if ($firstChar == '-' || $firstChar == '+') {
+            $field = substr($field, 1);
         }
+
+        return trim($field);
     }
 
     /**
@@ -60,14 +78,16 @@ class SortModifier extends BaseModifier {
      * @param $char
      * @return string
      */
-    protected function symbolToOrder($char) {
-        if($char == '-') {
+    protected function symbolToOrder($char)
+    {
+        if ($char == '-') {
             return 'DESC';
-        }
-        else if($char == '+') {
-            return 'ASC';
-        }else {
-            return 'ASC';
+        } else {
+            if ($char == '+') {
+                return 'ASC';
+            } else {
+                return 'ASC';
+            }
         }
     }
 
@@ -78,10 +98,11 @@ class SortModifier extends BaseModifier {
      *
      * @return bool|array
      */
-    protected function fetchValuesFromData() {
+    protected function fetchValuesFromData()
+    {
         $sortIndex = $this->config->getSort();
 
-        if(!isset($this->data[$sortIndex])) {
+        if (!isset($this->data[$sortIndex])) {
             return false;
         }
 
@@ -94,16 +115,24 @@ class SortModifier extends BaseModifier {
      * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Exception
      */
-    protected function addSortToQueryBuilder() {
+    protected function addSortToQueryBuilder()
+    {
         $fields = $this->listToArray($this->sortString);
         $allowedFields = $this->config->getFilterableFields();
 
-        foreach($fields as $field) {
-            $field = trim($field);
-            if(empty($allowedFields[$field])) {
+        $hasEagerLoad = $this->hasEagerLoad();
+
+        foreach ($fields as $field) {
+            $field = $this->removeOrderingFromField($field);
+
+            if (!empty($allowedFields[$field])) {
+                $this->builder = $this->builder->orderBy($field, $this->order);
+                continue;
+            }
+
+            if (!$hasEagerLoad) {
                 $this->throwInvalidFieldException($field);
             }
-            $this->builder = $this->builder->orderBy($field, $this->order);
         }
 
         return $this->builder;

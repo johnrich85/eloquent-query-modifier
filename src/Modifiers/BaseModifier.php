@@ -2,7 +2,8 @@
 
 use Johnrich85\EloquentQueryModifier\InputConfig;
 
-abstract class BaseModifier implements QBModifier {
+abstract class BaseModifier implements QBModifier
+{
 
     /**
      * @var InputConfig
@@ -19,7 +20,8 @@ abstract class BaseModifier implements QBModifier {
      */
     protected $builder;
 
-    public function __construct(array $data, \Illuminate\Database\Eloquent\Builder $builder, InputConfig $config) {
+    public function __construct(array $data, \Illuminate\Database\Eloquent\Builder $builder, InputConfig $config)
+    {
         $this->data = $data;
         $this->builder = $builder;
         $this->config = $config;
@@ -32,18 +34,29 @@ abstract class BaseModifier implements QBModifier {
      * @param $list
      * @return array
      */
-    protected function listToArray($list) {
+    protected function listToArray($list)
+    {
         $payload = array_map(
-            'trim', explode(',', $list)
+            'trim',
+            explode(',', $list)
         );
 
         return $payload;
     }
 
     /**
+     * @return bool
+     */
+    protected function hasEagerLoad()
+    {
+        return $hasEagerLoad = (boolean)count($this->builder->getEagerLoads());
+    }
+
+    /**
      * @throws \Exception
      */
-    protected function throwNoDataException() {
+    protected function throwNoDataException()
+    {
         throw new \Exception('Query parameter provided, but contains no data.');
     }
 
@@ -51,15 +64,26 @@ abstract class BaseModifier implements QBModifier {
      * @param $field
      * @throws \Exception
      */
-    protected function throwInvalidFieldException($field)  {
+    protected function throwInvalidFieldException($field)
+    {
         throw new \Exception('Query string parameter contains an invalid field: ' . $field);
     }
 
-    protected function throwSearchNotSupportedException($class)  {
-        throw new \Exception($class . " does not support search. To enable search for this model implement the 'Sofa\Eloquence\Eloquence' trait.");
+    /**
+     * @param $class
+     * @throws \Exception
+     */
+    protected function throwSearchNotSupportedException($class)
+    {
+        $message = $class;
+        $message .= ' does not support search. ';
+        $message .= 'To enable search for this model implement the Sofa\Eloquence\Eloquence trait';
+
+        throw new \Exception($message);
     }
 }
 
-interface QBModifier {
+interface QBModifier
+{
     public function modify();
 }

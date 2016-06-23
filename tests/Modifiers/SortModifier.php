@@ -105,7 +105,7 @@ class SortModifierTest extends Johnrich85\Tests\BaseTest {
             ->method('getFilterableFields')
             ->will($this->returnValue($data));
 
-        $this->builder->expects($this->at(0))
+        $this->builder->expects($this->any())
             ->method('__call')
             ->with($this->equalTo('orderBy'), $this->equalTo(array('name', 'ASC')))
             ->will($this->returnValue($this->builder));
@@ -128,14 +128,41 @@ class SortModifierTest extends Johnrich85\Tests\BaseTest {
             ->method('getFilterableFields')
             ->will($this->returnValue($data));
 
-        $this->builder->expects($this->at(0))
+        $this->builder->expects($this->at(1))
             ->method('__call')
             ->with($this->equalTo('orderBy'), $this->equalTo(array('name', 'ASC')))
             ->will($this->returnValue($this->builder));
 
-        $this->builder->expects($this->at(1))
+        $this->builder->expects($this->at(2))
             ->method('__call')
             ->with($this->equalTo('orderBy'), $this->equalTo(array('description', 'ASC')))
+            ->will($this->returnValue($this->builder));
+
+        $method = $this->getMethod('addSortToQueryBuilder');
+        $method->invokeArgs($modifier, array());
+    }
+
+    public function testFieldsExcludedWhenUsingEagerLoading() {
+        $modifier = $this->_getInstance();
+        $modifier->setSortString("-name, non-existent");
+        $modifier->setOrder("ASC");
+
+        $this->builder->expects($this->any())
+            ->method('getEagerLoads')
+            ->will($this->returnValue([1]));
+
+        $data = array(
+            'name' => 'name',
+            'description' => 'description'
+        );
+
+        $this->config->expects($this->any())
+            ->method('getFilterableFields')
+            ->will($this->returnValue($data));
+
+        $this->builder->expects($this->once())
+            ->method('__call')
+            ->with($this->equalTo('orderBy'), $this->equalTo(array('name', 'ASC')))
             ->will($this->returnValue($this->builder));
 
         $method = $this->getMethod('addSortToQueryBuilder');

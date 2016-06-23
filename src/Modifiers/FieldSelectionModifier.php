@@ -1,46 +1,69 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
-class FieldSelectionModifier extends BaseModifier {
+class FieldSelectionModifier extends BaseModifier
+{
 
     /**
      * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Exception
      */
-    public function modify() {
+    public function modify()
+    {
         $fields = $this->fetchValuesFromData();
 
-        if($fields === false) {
+        if ($fields === false) {
             return $this->builder;
-        }
-        else if($fields == '') {
-            $this->throwNoDataException();
+        } else {
+            if ($fields == '') {
+                $this->throwNoDataException();
+            }
         }
 
         $fields = $this->listToArray($fields);
 
-        $this->checkForInvalidFields($fields);
+        $fields = $this->getValidFields($fields);
 
         return $this->builder->select($fields);
     }
 
     /**
      * Checks for fields that do not exist, throws
-     * exception if found.
      *
      * @param $fields
      * @return bool
      * @throws \Exception
      */
-    protected function checkForInvalidFields($fields) {
+    protected function getValidFields($fields)
+    {
         $allowedFields = $this->config->getFilterableFields();
 
-        foreach($fields as $field) {
-            if(empty($allowedFields[$field])) {
+        $hasEagerLoad = $this->hasEagerLoad();
+
+        foreach ($fields as $key => $field) {
+            if (!empty($allowedFields[$field])) {
+                continue;
+            }
+
+            if ($hasEagerLoad) {
+                unset($fields[$key]);
+            } else {
                 $this->throwInvalidFieldException($field);
             }
         }
 
-        return false;
+        if (empty($fields)) {
+            $fields = $this->getDefaultValue();
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDefaultValue()
+    {
+        return ['*'];
     }
 
     /**
@@ -48,10 +71,11 @@ class FieldSelectionModifier extends BaseModifier {
      *
      * @return bool
      */
-    protected function fetchValuesFromData() {
+    protected function fetchValuesFromData()
+    {
         $fieldSelectionIndex = $this->config->getFields();
 
-        if(empty($this->data[$fieldSelectionIndex])) {
+        if (empty($this->data[$fieldSelectionIndex])) {
             return false;
         }
 
