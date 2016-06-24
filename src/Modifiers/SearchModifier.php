@@ -27,14 +27,10 @@ class SearchModifier extends BaseModifier
         $this->search = $this->fetchValuesFromData();
         $this->searchMode = $this->config->getSearchMode();
 
-        if ($this->search === false) {
+        if (empty($this->search)) {
             return $this->builder;
-        } else {
-            if ($this->search == '') {
-                $this->throwNoDataException();
-            }
         }
-
+        
         return $this->addSearchToQueryBuilder();
     }
 
