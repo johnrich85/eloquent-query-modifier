@@ -1,5 +1,14 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
 class FieldSelectionModifier extends BaseModifier
 {
 
@@ -39,6 +48,7 @@ class FieldSelectionModifier extends BaseModifier
 
         $hasEagerLoad = $this->hasEagerLoad();
 
+
         foreach ($fields as $key => $field) {
             if (!empty($allowedFields[$field])) {
                 continue;
@@ -53,11 +63,67 @@ class FieldSelectionModifier extends BaseModifier
 
         if (empty($fields)) {
             $fields = $this->getDefaultValue();
+        } else {
+            $fields = $this->addRequiredFields($fields);
         }
 
         return $fields;
     }
 
+    /**
+     * Adds required fields to query (eager loading
+     * requires that keys be selected, else related
+     * models are not returned.)
+     *
+     * @param array $fields
+     * @return array
+     */
+    public function addRequiredFields(array $fields)
+    {
+        $relations = $this->builder->getEagerLoads();
+
+        foreach ($relations as $name => $relation) {
+            $relation = $this->builder->getRelation($name);
+
+            $requiredColumns = $this->addKeys($relation);
+
+            $fields = array_merge($fields, $requiredColumns);
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Returns keys as an array.
+     *
+     * @param $relation
+     * @return array
+     */
+    protected function addKeys($relation)
+    {
+        $payload = [];
+
+        if ($relation instanceof MorphTo || $relation instanceof MorphToMany) {
+            $payload[] = $relation->getForeignKey();
+            $payload[] = $relation->getMorphType();
+        } elseif ($relation instanceof BelongsToMany || $relation instanceof BelongsTo) {
+            $payload[] = $this->builder->getModel()->getKeyName();
+        } elseif ($relation instanceof MorphOneOrMany) {
+            $payload[] = $this->builder->getModel()->getKeyName();
+        } elseif ($relation instanceof MorphPivot) {
+            $payload[] = $relation->getForeignKey();
+            $payload[] = $relation->getMorphClass();
+            $payload[] = $this->builder->getModel()->getKeyName();
+        } elseif ($relation instanceof Pivot) {
+            $payload[] = $relation->getForeignKey();
+            $payload[] = $relation->getOtherKey();
+            $payload[] = $this->builder->getModel()->getKeyName();
+        } else {
+            $payload[] = $this->builder->getModel()->getKeyName();
+        }
+
+        return $payload;
+    }
     /**
      * @return array
      */
