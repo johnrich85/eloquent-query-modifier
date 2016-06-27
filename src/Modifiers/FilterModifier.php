@@ -80,15 +80,78 @@ class FilterModifier extends BaseModifier
     /**
      * @param $field
      * @param $value
+     * @throws \Exception
      */
     protected function addWhereFilter($field, $value)
     {
-        if ($this->filterType == 'orWhere' && !$this->first) {
-            $this->builder = $this->builder->orWhere($field, $value);
+        $json = $this->getDecoded($value);
+
+        if ($json) {
+            $value = $this->getJsonValue($json);
+            $operator = $this->getJsonOperator($json);
         } else {
-            $this->builder = $this->builder->where($field, $value);
+            $operator = '=';
+        }
+
+        if ($value !== null && $operator !== null) {
+            $this->addWhereType($field, $operator, $value);
+        } else {
+            $error = "Invalid data supplied via $field parameter. Please supply valid 'value' and 'operator'.";
+            throw new \Exception($error);
+        }
+    }
+
+    /**
+     * @param $field
+     * @param $operator
+     * @param $value
+     */
+    protected function addWhereType($field, $operator, $value)
+    {
+        if ($this->filterType == 'orWhere' && !$this->first) {
+            $this->builder = $this->builder->orWhere($field, $operator, $value);
+        } else {
+            $this->builder = $this->builder->where($field, $operator, $value);
             $this->first = false;
         }
+    }
+
+    /**
+     * @param $value
+     *
+     * @return mixed
+     */
+    protected function getDecoded($value)
+    {
+        $decoded = json_decode($value, true);
+
+        return $decoded;
+    }
+
+    /**
+     * @param array $decoded
+     * @return mixed|null
+     */
+    protected function getJsonValue(array $decoded)
+    {
+        if (isset($decoded['value'])) {
+            return $decoded['value'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array $decoded
+     * @return mixed|null
+     */
+    protected function getJsonOperator(array $decoded)
+    {
+        if (isset($decoded['operator'])) {
+            return $decoded['operator'];
+        }
+
+        return null;
     }
 
     /**

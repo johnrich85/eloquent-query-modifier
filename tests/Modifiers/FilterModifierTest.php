@@ -41,7 +41,7 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest
 
         $this->assertEquals(false, $result);
     }
-    
+
     public function testModify()
     {
         $modifier = $this->_getInstance();
@@ -66,6 +66,26 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest
             ->will($this->returnValue($this->builder));
 
         $modifier->modify();
+    }
+
+    public function testModifyWithValidJson()
+    {
+        //todo
+    }
+
+    public function testModifyWithInvalidJsonThrowsException()
+    {
+        //todo
+    }
+
+    public function testJsonSupportsFalseValue()
+    {
+        //todo
+    }
+
+    public function testJsonSupportsZeroValue()
+    {
+        //todo
     }
 
     public function testModifyUsingOr()
