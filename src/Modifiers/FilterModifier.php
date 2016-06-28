@@ -84,16 +84,16 @@ class FilterModifier extends BaseModifier
      */
     protected function addWhereFilter($field, $value)
     {
-        $json = $this->getDecoded($value);
+        $operator = '=';
+
+        $json = $this->jsonDecode($value);
 
         if ($json) {
             $value = $this->getJsonValue($json);
             $operator = $this->getJsonOperator($json);
-        } else {
-            $operator = '=';
         }
 
-        if ($value !== null && $operator !== null) {
+        if ($value !== null) {
             $this->addWhereType($field, $operator, $value);
         } else {
             $error = "Invalid data supplied via $field parameter. Please supply valid 'value' and 'operator'.";
@@ -118,14 +118,23 @@ class FilterModifier extends BaseModifier
 
     /**
      * @param $value
-     *
-     * @return mixed
+     * @return bool
      */
-    protected function getDecoded($value)
+    protected function jsonDecode($value)
     {
-        $decoded = json_decode($value, true);
+        if (!is_string($value)) {
+            return false;
+        }
 
-        return $decoded;
+        $json = json_decode($value, true);
+
+        $isJson = is_array($json) && (json_last_error() == JSON_ERROR_NONE);
+
+        if (!$isJson) {
+            return false;
+        }
+
+        return $json;
     }
 
     /**
