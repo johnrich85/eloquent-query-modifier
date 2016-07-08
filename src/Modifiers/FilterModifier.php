@@ -108,12 +108,57 @@ class FilterModifier extends BaseModifier
      */
     protected function addWhereType($field, $operator, $value)
     {
+        if ($this->isInclude($operator)) {
+            $this->builder = $this->builder->whereIn($field, $value);
+            return;
+        } elseif ($this->isExclude($operator)) {
+            $this->builder = $this->builder->whereNotIn($field, $value);
+        } else {
+            $this->addStandardWhere($field, $operator, $value);
+        }
+    }
+
+    /**
+     * Adds standard where filter.
+     *
+     * @param $field
+     * @param $operator
+     * @param $value
+     */
+    protected function addStandardWhere($field, $operator, $value)
+    {
         if ($this->filterType == 'orWhere' && !$this->first) {
             $this->builder = $this->builder->orWhere($field, $operator, $value);
         } else {
             $this->builder = $this->builder->where($field, $operator, $value);
             $this->first = false;
         }
+    }
+
+    /**
+     * @param $operator
+     * @return bool
+     */
+    protected function isInclude($operator)
+    {
+        if ($operator == 'include') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $operator
+     * @return bool
+     */
+    protected function isExclude($operator)
+    {
+        if ($operator == 'exclude') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
