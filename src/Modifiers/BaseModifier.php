@@ -2,6 +2,11 @@
 
 use Johnrich85\EloquentQueryModifier\InputConfig;
 
+/**
+ * Class BaseModifier
+ *
+ * @package Johnrich85\EloquentQueryModifier\Modifiers
+ */
 abstract class BaseModifier implements QBModifier
 {
 
@@ -20,6 +25,13 @@ abstract class BaseModifier implements QBModifier
      */
     protected $builder;
 
+    /**
+     * BaseModifier constructor.
+     *
+     * @param array $data
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param InputConfig $config
+     */
     public function __construct(array $data, \Illuminate\Database\Eloquent\Builder $builder, InputConfig $config)
     {
         $this->data = $data;

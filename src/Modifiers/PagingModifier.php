@@ -22,11 +22,8 @@ class PagingModifier extends BaseModifier {
     public function modify() {
         $this->pageNum = $this->fetchValuesFromData();
 
-        if($this->pageNum === false) {
+        if($this->pageNum == false) {
             return $this->builder;
-        }
-        else if($this->pageNum == '') {
-            $this->throwNoDataException();
         }
 
         return $this->addPagingToQueryBuilder();
