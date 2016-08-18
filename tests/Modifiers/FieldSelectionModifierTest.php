@@ -1,7 +1,7 @@
 <?php ;
 
 use Johnrich85\EloquentQueryModifier\Modifiers\FieldSelectionModifier;
-use Illuminate\Support\Facades\DB;
+use \Johnrich85\EloquentQueryModifier\InputConfig;
 use \Johnrich85\EloquentQueryModifier\Tests\Mock\Models as Models;
 
 class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
@@ -14,7 +14,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('books');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -33,7 +33,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('books');
 
-        $modifier = $this->_getInstance($query);
+        $modifier = $this->_getInstance($query, []);
 
         $result = $modifier->addRequiredFields(['id', 'name']);
 
@@ -51,7 +51,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
             ->with('city');
 
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -70,7 +70,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('authors');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -89,7 +89,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('authors');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -108,7 +108,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('contact');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -127,7 +127,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('books');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -146,7 +146,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('book');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -165,7 +165,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('bookable');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -185,7 +185,7 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         $query  = $model->query()
             ->with('themes');
 
-        $modifier = $this->_getInstance($query, 'name');
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
         $modifier->modify($query);
 
         $reqFields = $modifier->addRequiredFields(['name']);
@@ -197,6 +197,124 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
 
         $this->assertEquals(1, count($query->find(1)->themes));
     }
+
+    public function test_with_no_fields_returns_builder()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, []);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        $this->assertEquals(null, $result->getQuery()->columns);
+    }
+
+    public function test_empty_fields_returns_builder()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, ['fields' => '']);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        $this->assertEquals(null, $result->getQuery()->columns);
+    }
+
+    public function test_supports_one_value()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        $this->assertContains('name', $result->getQuery()->columns);
+    }
+
+    public function test_supports_multi_value()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, ['fields' => 'name, id']);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        $this->assertContains('name', $result->getQuery()->columns);
+        $this->assertContains('id', $result->getQuery()->columns);
+    }
+
+    public function test_fields_are_trimmed()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, ['fields' => ' name , id ']);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+        $this->assertContains('name', $result->getQuery()->columns);
+        $this->assertContains('id', $result->getQuery()->columns);
+    }
+
+    public function test_invalid_format_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, ['fields' => 'id;name']);
+
+        $this->setExpectedException(Exception::class);
+
+        $result = $modifier->modify($query);
+    }
+
+    public function test_invalid_fields_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, ['fields' => 'id, idontexist']);
+
+        $this->setExpectedException(Exception::class);
+
+        $result = $modifier->modify($query);
+    }
+
+    public function test_only_selected_fields_are_returned()
+    {
+        $this->populateDatabase();
+
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $modifier = $this->_getInstance($query, ['fields' => 'name']);
+
+        $result = $modifier->modify($query);
+
+        $model = $result->find(1);
+        $atts = $model->getAttributes();
+
+        $this->assertEquals(1, count($atts));
+        $this->assertEquals(true, array_has($atts, 'name'));
+    }
+
 
     public function populateDatabase()
     {
@@ -299,24 +417,23 @@ class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
         return $cat;
     }
 
+    protected function _getInstance($query, $fields = [], $config = null) {
+        $this->data = $fields;
 
-    protected function _getInstance($query, $fields = []) {
-        $this->data = array(
-            'fields' => $fields
-        );
+        if(!$config) {
+            $config = new \Johnrich85\EloquentQueryModifier\InputConfig();
+            $config->setFilterableFields($query);
+        }
 
-        $this->config = new \Johnrich85\EloquentQueryModifier\InputConfig();
-        $this->config->setFilterableFields($query);
-
-        return new FieldSelectionModifier($this->data, $query, $this->config);
+        return new FieldSelectionModifier($this->data, $query, $config);
     }
 
     /**
-     *
+     * @return mixed
      */
-    protected function getBuilderInstance()
+    protected function getEloquentBuilderMock()
     {
-        $this->builder = $this->getMockBuilder('\Illuminate\Database\Eloquent\Builder')
+        return $this->getMockBuilder('\Illuminate\Database\Eloquent\Builder')
             ->disableOriginalConstructor()
             ->getMock();
     }

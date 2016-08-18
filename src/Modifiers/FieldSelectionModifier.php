@@ -2,16 +2,17 @@
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Laracasts\TestDummy\EloquentModel;
 
+/**
+ * Class FieldSelectionModifier
+ *
+ * @package Johnrich85\EloquentQueryModifier\Modifiers
+ */
 class FieldSelectionModifier extends BaseModifier
 {
 
@@ -25,10 +26,6 @@ class FieldSelectionModifier extends BaseModifier
 
         if ($fields === false) {
             return $this->builder;
-        } else {
-            if ($fields == '') {
-                $this->throwNoDataException();
-            }
         }
 
         $fields = $this->listToArray($fields);
