@@ -84,3 +84,8 @@ $modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config, $fac
 
 **Basic Search:** ?q=search term
 
+##Todo
+
+1. Test for EloquentQueryModifier.
+2. Composer possible conflicts with laravel...
+
