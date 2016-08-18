@@ -1,13 +1,14 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
 use Johnrich85\EloquentQueryModifier\InputConfig;
+use Johnrich85\EloquentQueryModifier\Modifiers\Contract\EqmCanModify;
 
 /**
  * Class BaseModifier
  *
  * @package Johnrich85\EloquentQueryModifier\Modifiers
  */
-abstract class BaseModifier implements QBModifier
+abstract class BaseModifier implements EqmCanModify
 {
 
     /**
@@ -93,9 +94,4 @@ abstract class BaseModifier implements QBModifier
 
         throw new \Exception($message);
     }
-}
-
-interface QBModifier
-{
-    public function modify();
 }

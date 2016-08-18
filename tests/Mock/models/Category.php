@@ -1,8 +1,16 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Tests\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Sofa\Eloquence\Eloquence;
 
 class Category extends Model {
+
+    use Eloquence;
+
+    /**
+     * @var array
+     */
+    protected $searchableColumns = ['name'];
 
 	/**
 	 * The fillable attributes.

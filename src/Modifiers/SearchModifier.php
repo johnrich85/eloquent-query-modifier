@@ -58,7 +58,7 @@ class SearchModifier extends BaseModifier
     protected function addSearchToQueryBuilder()
     {
         try {
-            if ($this->searchMode == 'wildcard') {
+            if ($this->searchMode == 'column_limited') {
                 $this->builder->search($this->search);
             } else {
                 $this->builder->search($this->search, false);

@@ -45,7 +45,7 @@ class InputConfig {
      *
      * @var string[wildcard|literal]
      */
-    protected $searchMode = 'wildcard';
+    protected $searchMode = 'column_limited';
 
     /**
      * The name of the page parameter.

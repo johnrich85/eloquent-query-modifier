@@ -2,8 +2,13 @@
 
 use Orchestra\Testbench\TestCase;
 use \Johnrich85\EloquentQueryModifier\Tests\Mock\Models as Models;
+use Sofa\Eloquence\ServiceProvider;
 
-
+/**
+ * Class BaseTest
+ *
+ * @package Johnrich85\Tests
+ */
 abstract class BaseTest extends TestCase{
 
     protected $config;
@@ -158,4 +163,10 @@ abstract class BaseTest extends TestCase{
         return $cat;
     }
 
+    protected function getPackageProviders($app)
+    {
+        return [
+            ServiceProvider::class
+        ];
+    }
 }
