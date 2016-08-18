@@ -492,7 +492,7 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals(3, $wheres[0]['values'][2]);
         $this->assertEquals('and', $wheres[0]['boolean']);
 
-        $this->assertEquals(0, count($query->get()));
+        $this->assertEquals(1, count($query->get()));
     }
 
     /**

@@ -29,12 +29,8 @@ class SortModifier extends BaseModifier
     {
         $this->sortString = $this->fetchValuesFromData();
 
-        if ($this->sortString === false) {
+        if ($this->sortString == false) {
             return $this->builder;
-        } else {
-            if ($this->sortString == '') {
-                $this->throwNoDataException();
-            }
         }
 
         $this->parseSortOrder();
@@ -120,18 +116,12 @@ class SortModifier extends BaseModifier
         $fields = $this->listToArray($this->sortString);
         $allowedFields = $this->config->getFilterableFields();
 
-        $hasEagerLoad = $this->hasEagerLoad();
-
         foreach ($fields as $field) {
             $field = $this->removeOrderingFromField($field);
 
             if (!empty($allowedFields[$field])) {
                 $this->builder = $this->builder->orderBy($field, $this->order);
                 continue;
-            }
-
-            if (!$hasEagerLoad) {
-                $this->throwInvalidFieldException($field);
             }
         }
 
