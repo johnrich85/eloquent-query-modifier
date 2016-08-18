@@ -144,11 +144,7 @@ class FilterModifier extends BaseModifier
      */
     protected function isInclude($operator)
     {
-        if ($operator == 'include') {
-            return true;
-        }
-
-        return false;
+        return $operator == 'include';
     }
 
     /**
@@ -157,11 +153,7 @@ class FilterModifier extends BaseModifier
      */
     protected function isExclude($operator)
     {
-        if ($operator == 'exclude') {
-            return true;
-        }
-
-        return false;
+        return $operator == 'exclude';
     }
 
     /**
