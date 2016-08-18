@@ -1,6 +1,8 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
+use Johnrich85\EloquentQueryModifier\FilterQuery;
 use Johnrich85\EloquentQueryModifier\InputConfig;
+use Mockery\CountValidator\Exception;
 
 class FilterModifier extends BaseModifier
 {
@@ -34,13 +36,9 @@ class FilterModifier extends BaseModifier
     {
         $fields = $this->getFilterableFields();
 
-        if ($fields === false) {
+        if ($fields == false) {
             return $this->builder;
-        } else {
-            if ($fields == '') {
-                $this->throwNoDataException();
-            }
-        }
+        };
 
         foreach ($fields as $field) {
             if (empty($this->data[$field])) {
@@ -50,7 +48,7 @@ class FilterModifier extends BaseModifier
             $data = $this->data[$field];
 
             if (is_array($data)) {
-                $this->addWhereFilters($field, $data);
+                $this->addWhereInFilter($field, $data);
                 continue;
             }
 
@@ -80,24 +78,25 @@ class FilterModifier extends BaseModifier
     /**
      * @param $field
      * @param $value
-     * @throws \Exception
      */
     protected function addWhereFilter($field, $value)
     {
         $operator = '=';
 
-        $json = $this->jsonDecode($value);
+        if (is_object($value)) {
+            $operator = $value->operator;
+            $value = $value->value;
+        } else {
+            $json = $this->jsonDecode($value);
 
-        if ($json) {
-            $value = $this->getJsonValue($json);
-            $operator = $this->getJsonOperator($json);
+            if ($json) {
+                $value = $this->getJsonValue($json);
+                $operator = $this->getJsonOperator($json);
+            }
         }
 
         if ($value !== null) {
             $this->addWhereType($field, $operator, $value);
-        } else {
-            $error = "Invalid data supplied via $field parameter. Please supply valid 'value' and 'operator'.";
-            throw new \Exception($error);
         }
     }
 
@@ -127,6 +126,10 @@ class FilterModifier extends BaseModifier
      */
     protected function addStandardWhere($field, $operator, $value)
     {
+        if($operator == '==') {
+            $operator = '=';
+        }
+
         if ($this->filterType == 'orWhere' && !$this->first) {
             $this->builder = $this->builder->orWhere($field, $operator, $value);
         } else {
@@ -197,7 +200,7 @@ class FilterModifier extends BaseModifier
 
     /**
      * @param array $decoded
-     * @return mixed|null
+     * @return string
      */
     protected function getJsonOperator(array $decoded)
     {
@@ -205,7 +208,7 @@ class FilterModifier extends BaseModifier
             return $decoded['operator'];
         }
 
-        return null;
+        return '=';
     }
 
     /**
@@ -215,11 +218,20 @@ class FilterModifier extends BaseModifier
      * @param $field
      * @param array $data
      */
-    protected function addWhereFilters($field, array $data)
+    protected function addWhereInFilter($field, array $data)
     {
-        foreach ($data as $fieldValue) {
-            $this->addWhereFilter($field, $fieldValue);
+        if(array_key_exists('operator', $data) || array_key_exists('value', $data)) {
+            $error = 'Field value must be an object, not an array. Arrays are supported but only for WhereIn queries.';
+            $error.= 'Please refer to documentation for further info.';
+
+            throw new Exception($error);
         }
+
+        $queryOb = new FilterQuery();
+        $queryOb->operator = 'include';
+        $queryOb->value = $data;
+
+        $this->addWhereFilter($field, $queryOb);
     }
 
     /**
