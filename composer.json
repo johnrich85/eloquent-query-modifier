@@ -17,5 +17,8 @@
     "psr-4": {
       "Johnrich85\\EloquentQueryModifier\\": "src/"
     }
+  },
+  "require-dev": {
+    "orchestra/testbench": "~3.0"
   }
 }

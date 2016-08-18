@@ -1,142 +1,323 @@
 <?php ;
+
 use Johnrich85\EloquentQueryModifier\Modifiers\FieldSelectionModifier;
 use Illuminate\Support\Facades\DB;
+use \Johnrich85\EloquentQueryModifier\Tests\Mock\Models as Models;
 
 class FieldSelectionModifierTest extends Johnrich85\Tests\BaseTest {
 
-    protected $testClass = '\Johnrich85\EloquentQueryModifier\Modifiers\FieldSelectionModifier';
+    public function test_does_add_required_fields_for_belongs_to_many_relation() {
+        $this->populateDatabase();
 
-    public function testCheckForInvalidFields() {
-        $modifier = $this->_getInstance();
+        $model = new Models\Author();
 
-        $this->config->expects($this->any())
-            ->method('getFilterableFields')
-            ->will($this->returnValue(array(
-                    'name' => 'name',
-                    'description' => 'description'
-                )
-            ));
+        $query  = $model->query()
+            ->with('books');
 
-        $fields = array(
-            'name',
-            'description'
-        );
-        $method = $this->getMethod('getValidFields');
-        $result = $method->invokeArgs($modifier, array($fields));
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
 
-        $this->assertEquals($fields, $result);
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('id', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertEquals(1, count($query->find(1)->books));
     }
 
-    public function testCheckForInvalidFieldsThrowsException() {
-        $modifier = $this->_getInstance();
+    public function test_does_not_duplicate_keys() {
+        $this->populateDatabase();
 
-        $this->config->expects($this->any())
-            ->method('getFilterableFields')
-            ->will($this->returnValue(array(
-                    'name' => 'name',
-                    'description' => 'description'
-                )
-            ));
+        $model = new Models\Author();
 
-        $fields = array(
-            'name',
-            'invalidField'
-        );
+        $query  = $model->query()
+            ->with('books');
 
-        $this->setExpectedException('Exception');
+        $modifier = $this->_getInstance($query);
 
-        $method = $this->getMethod('getValidFields');
-        $method->invokeArgs($modifier, array($fields));
+        $result = $modifier->addRequiredFields(['id', 'name']);
+
+        $this->assertEquals(2, count($result));
+        $this->assertContains('id', $result);
+        $this->assertContains('name', $result);
     }
 
-    public function testUnfoundFieldsWorkWhenUsingEagerLoading() {
-        $modifier = $this->_getInstance();
+    public function test_does_add_required_fields_for_belongs_to_relation() {
+        $this->populateDatabase();
 
-        $this->builder->expects($this->any())
-            ->method('getEagerLoads')
-            ->will($this->returnValue([1]));
+        $model = new Models\Author();
 
-        $this->config->expects($this->any())
-            ->method('getFilterableFields')
-            ->will($this->returnValue(array(
-                    'name' => 'name',
-                    'description' => 'description'
-                )
-            ));
-
-        $fields = array(
-            'name',
-            'invalidField'
-        );
+        $query  = $model->query()
+            ->with('city');
 
 
-        $method = $this->getMethod('getValidFields');
-        $result = $method->invokeArgs($modifier, array($fields));
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
 
-        $this->assertEquals(array('name'), $result);
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('city_id', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertEquals(1, count($query->find(1)->city));
     }
 
-    public function testFetchValuesFromData() {
-        $modifier = $this->_getInstance();
+    public function test_does_add_required_fields_for_has_many_relation() {
+        $this->populateDatabase();
 
-        $this->config->expects($this->any())
-            ->method('getFields')
-            ->will($this->returnValue('fields'));
+        $model = new Models\City();
 
-        $method = $this->getMethod('fetchValuesFromData');
-        $result = $method->invokeArgs($modifier, array());
+        $query  = $model->query()
+            ->with('authors');
 
-        $this->assertEquals('name, description' ,$result);
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
+
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('id', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertEquals(1, count($query->find(1)->authors));
     }
 
-    public function testFetchValuesFromDataWithoutData() {
-        $modifier = $this->_getInstance();
+    public function test_does_add_required_fields_for_has_many_through_relation() {
+        $this->populateDatabase();
 
-        $this->config->expects($this->any())
-            ->method('getFields')
-            ->will($this->returnValue('non_existent_index'));
+        $model = new Models\Country();
 
-        $method = $this->getMethod('fetchValuesFromData');
-        $result = $method->invokeArgs($modifier, array());
+        $query  = $model->query()
+            ->with('authors');
 
-        $this->assertEquals(false ,$result);
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
+
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('id', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertEquals(1, count($query->find(1)->authors));
     }
 
-    public function testModifyCallsSelect() {
-        $modifier = $this->_getInstance();
+    public function test_does_add_required_fields_for_has_one_relation() {
+        $this->populateDatabase();
 
-        $data = array(
-            'name' => 'name',
-            'description' => 'description'
-        );
+        $model = new Models\Editor();
 
-        $this->config->expects($this->any())
-            ->method('getFields')
-            ->will($this->returnValue('fields'));
+        $query  = $model->query()
+            ->with('contact');
 
-        $this->config->expects($this->any())
-            ->method('getFilterableFields')
-            ->will($this->returnValue($data));
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
 
-        $this->builder->expects($this->atLeastOnce())
-            ->method('__call')
-            ->with($this->equalTo('select'),$this->anything())
-            ->will($this->returnValue(true));
+        $reqFields = $modifier->addRequiredFields(['name']);
 
-        $method = $this->getMethod('modify');
-        $method->invokeArgs($modifier, array());
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('id', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertEquals(1, count($query->find(1)->contact));
     }
 
-    protected function _getInstance() {
+    public function test_does_add_required_fields_for_morph_many_relation() {
+        $this->populateDatabase();
+
+        $model = new Models\Editor();
+
+        $query  = $model->query()
+            ->with('books');
+
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
+
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('id', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertEquals(1, count($query->find(1)->books));
+    }
+
+    public function test_does_add_required_fields_for_morph_one_relation() {
+        $this->populateDatabase();
+
+        $model = new Models\Category();
+
+        $query  = $model->query()
+            ->with('book');
+
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
+
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('id', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertEquals(1, count($query->find(1)->book));
+    }
+
+    public function test_does_add_required_fields_for_morph_to_relation() {
+        $this->populateDatabase();
+
+        $model = new Models\Book();
+
+        $query  = $model->query()
+            ->with('bookable');
+
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
+
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+        $this->assertEquals(3, count($reqFields));
+        $this->assertContains('bookable_id', $reqFields);
+        $this->assertContains('bookable_type', $reqFields);
+        $this->assertContains('name', $reqFields);
+        $this->assertInstanceOf(Models\Editor::class, $query->find(2)->bookable);
+    }
+
+    public function test_does_add_required_fields_for_morph_to_many_relation() {
+        $this->populateDatabase();
+
+        $model = new Models\Category();
+
+        $query  = $model->query()
+            ->with('themes');
+
+        $modifier = $this->_getInstance($query, 'name');
+        $modifier->modify($query);
+
+        $reqFields = $modifier->addRequiredFields(['name']);
+
+
+        $this->assertEquals(2, count($reqFields));
+        $this->assertContains('id', $reqFields);
+        $this->assertContains('name', $reqFields);
+
+        $this->assertEquals(1, count($query->find(1)->themes));
+    }
+
+    public function populateDatabase()
+    {
+        $country = new Models\Country([
+            'name' => 'United Kingdom'
+        ]);
+        $country->save();
+
+        $city = new Models\City([
+            'name' => 'Newcastle',
+            'country_id' => 1
+        ]);
+        $city->save();
+
+        $book = new Models\Book([
+            'name' => 'Book 1'
+        ]);
+
+        $this->createAuthor($book, $city);
+
+        $this->createEditor();
+
+        $this->createCategory();
+    }
+
+    /**
+     * @param $book
+     * @param $city
+     */
+    protected function createAuthor($book, $city)
+    {
+        $author = new Models\Author([
+            'name' => 'Author 1'
+        ]);
+
+        $author->save();
+
+        $author->books()->save($book);
+
+        $author->city()->associate($city);
+
+        $author->save();
+    }
+
+    /**
+     * @return Models\Editor
+     */
+    protected function createEditor()
+    {
+        $editor = new Models\Editor([
+            'name' => 'Editor 1'
+        ]);
+
+        $editor->save();
+
+        $contact = new Models\Contact([
+            'phone' => 123
+        ]);
+
+        $editor->contact()->save($contact);
+
+        $book = new Models\Book([
+            'name' => 'Book 2'
+        ]);
+
+        $book->save();
+
+        $editor->books()->save($book);
+
+        return $editor;
+    }
+
+    /**
+     * @return Models\Category
+     */
+    protected function createCategory()
+    {
+        $cat = new Models\Category([
+            'name' => 'Cat 1'
+        ]);
+
+        $cat->save();
+
+        $book = new Models\Book([
+            'name' => 'Book 3'
+        ]);
+
+        $book->save();
+
+        $cat->book()->save($book);
+
+        $theme = new Models\Theme([
+            'name' => 'Theme 1'
+        ]);
+
+        $theme->save();
+
+        $cat->themes()->save($theme);
+
+        return $cat;
+    }
+
+
+    protected function _getInstance($query, $fields = []) {
         $this->data = array(
-            'fields' => 'name, description'
+            'fields' => $fields
         );
-        $this->config = $this->getMock('\Johnrich85\EloquentQueryModifier\InputConfig');
+
+        $this->config = new \Johnrich85\EloquentQueryModifier\InputConfig();
+        $this->config->setFilterableFields($query);
+
+        return new FieldSelectionModifier($this->data, $query, $this->config);
+    }
+
+    /**
+     *
+     */
+    protected function getBuilderInstance()
+    {
         $this->builder = $this->getMockBuilder('\Illuminate\Database\Eloquent\Builder')
             ->disableOriginalConstructor()
             ->getMock();
-
-
-        return new FieldSelectionModifier($this->data, $this->builder, $this->config);
     }
 }

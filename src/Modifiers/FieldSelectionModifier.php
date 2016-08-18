@@ -2,12 +2,15 @@
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Laracasts\TestDummy\EloquentModel;
 
 class FieldSelectionModifier extends BaseModifier
 {
@@ -47,7 +50,6 @@ class FieldSelectionModifier extends BaseModifier
         $allowedFields = $this->config->getFilterableFields();
 
         $hasEagerLoad = $this->hasEagerLoad();
-
 
         foreach ($fields as $key => $field) {
             if (!empty($allowedFields[$field])) {
@@ -90,7 +92,7 @@ class FieldSelectionModifier extends BaseModifier
             $fields = array_merge($fields, $requiredColumns);
         }
 
-        return $fields;
+        return array_unique($fields);
     }
 
     /**
@@ -103,13 +105,16 @@ class FieldSelectionModifier extends BaseModifier
     {
         $payload = [];
 
-        if ($relation instanceof MorphTo || $relation instanceof MorphToMany) {
+        if ($relation instanceof MorphTo) {
             $payload[] = $relation->getForeignKey();
             $payload[] = $relation->getMorphType();
-        } elseif ($relation instanceof BelongsToMany || $relation instanceof BelongsTo) {
+        } elseif ($relation instanceof MorphToMany ||
+            $relation instanceof BelongsToMany ||
+            $relation instanceof MorphOneOrMany
+        ) {
             $payload[] = $this->builder->getModel()->getKeyName();
-        } elseif ($relation instanceof MorphOneOrMany) {
-            $payload[] = $this->builder->getModel()->getKeyName();
+        } elseif ($relation instanceof BelongsTo) {
+            $payload[] = $relation->getForeignKey();
         } elseif ($relation instanceof MorphPivot) {
             $payload[] = $relation->getForeignKey();
             $payload[] = $relation->getMorphClass();

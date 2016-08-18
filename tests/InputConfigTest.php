@@ -4,14 +4,6 @@ use Johnrich85\EloquentQueryModifier\InputConfig;
 
 class InputConfigTest extends \Johnrich85\Tests\BaseTest{
 
-    public function setUp() {
-
-    }
-
-    public function getBasePath() {
-
-    }
-
     public function testAddModifier()
     {
         $config = new InputConfig();
@@ -36,7 +28,4 @@ class InputConfigTest extends \Johnrich85\Tests\BaseTest{
         $this->assertEquals(4, count($modifiers));
     }
 
-    public function tearDown()
-    {
-    }
 }
