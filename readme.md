@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/johnrich85/eloquent-query-modifier.svg?branch=master)](https://travis-ci.org/johnrich85/eloquent-query-modifier)
+
 ## Details
 A wrapper for common Eloquent Query-builder usage. Supports Field selection, paging, key-value filtering, search & sorting. It is possibleto extend this further by adding your own modifiers that implement the 'QBModifier' interface.
 
