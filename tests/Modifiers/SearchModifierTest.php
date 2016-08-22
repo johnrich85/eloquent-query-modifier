@@ -69,7 +69,7 @@ class SearchModifierTest extends Johnrich85\Tests\BaseTest {
 
         $modifier->modify($query);
 
-        $this->assertEquals(2, count($query->get()));
+        $this->assertEquals(3, count($query->get()));
     }
 
     public function test_search_literal() {

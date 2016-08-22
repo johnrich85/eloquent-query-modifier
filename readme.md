@@ -86,7 +86,5 @@ $modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config, $fac
 
 ##Todo
 
-1. Test for EloquentQueryModifier.
-2. Test for custom modifiers
-3. Composer possible conflicts with laravel...
+1. Composer possible conflicts with laravel...
 

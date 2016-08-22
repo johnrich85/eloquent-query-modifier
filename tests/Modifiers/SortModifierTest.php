@@ -155,7 +155,7 @@ class SortModifierTest extends Johnrich85\Tests\BaseTest {
 
         $result = $query->get();
 
-        $this->assertEquals(2, count($result));
+        $this->assertEquals(3, count($result));
         $this->assertEquals('Cat 1', $result[0]->name);
     }
 
@@ -178,7 +178,7 @@ class SortModifierTest extends Johnrich85\Tests\BaseTest {
 
         $result = $query->get();
 
-        $this->assertEquals(2, count($result));
+        $this->assertEquals(3, count($result));
         $this->assertEquals('Another Cat', $result[0]->name);
     }
 

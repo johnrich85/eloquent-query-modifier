@@ -144,6 +144,11 @@ abstract class BaseTest extends TestCase{
         ]);
         $cat2->save();
 
+        $cat2 = new Models\Category([
+            'name' => 'B. Another cat'
+        ]);
+        $cat2->save();
+
         $book = new Models\Book([
             'name' => 'Book 3'
         ]);
