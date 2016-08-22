@@ -2,7 +2,7 @@
 A wrapper for common Eloquent Query-builder usage. Supports Field selection, paging, key-value filtering, search & sorting. It is possibleto extend this further by adding your own modifiers that implement the 'QBModifier' interface.
 
 ## Compatibility
-PHP          5.4+
+PHP          5.5+ (See version 1.04 for older versions)
 
 Laravel      5.0 - 5.1 (Use version 1.04. **Please note:** does not support free text search)
 
