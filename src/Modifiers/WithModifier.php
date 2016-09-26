@@ -1,6 +1,5 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
-use Johnrich85\EloquentQueryModifier\Exceptions\InvalidRelationException;
 use Johnrich85\EloquentQueryModifier\FilterSubQuery;
 
 /**
@@ -29,14 +28,10 @@ class WithModifier extends BaseModifier
     }
 
     /**
-     * Checks if relation actually exists - if so
-     * eager load is added. If not the script simply
-     * continues without adding eager load, rather than
-     * bombing out. This was deemed to be the best course
-     * of action due to the dynamic nature of this package.
+     * Adds eager loads. Throws exception if
+     * invalid relation provided.
      *
      * @param $eagerLoads
-     * @throws InvalidRelationException
      */
     protected function addEagerLoads($eagerLoads)
     {
@@ -44,7 +39,7 @@ class WithModifier extends BaseModifier
             try {
                 $this->builder->getRelation($name);
             } catch(\BadMethodCallException $e) {
-                continue;
+                $this->throwInvalidRelationException($name);
             }
 
             $this->addEagerLoad($name, $query);

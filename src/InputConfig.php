@@ -62,6 +62,13 @@ class InputConfig {
     protected $with = 'with';
 
     /**
+     * The name of the has parameter.
+     *
+     * @var string
+     */
+    protected $has = 'has';
+
+    /**
      * @var string
      */
     protected $filterType = 'andWhere';
@@ -243,6 +250,22 @@ class InputConfig {
     public function setWith($with)
     {
         $this->with = $with;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHas()
+    {
+        return $this->has;
+    }
+
+    /**
+     * @param string $with
+     */
+    public function setHas($has)
+    {
+        $this->has = $has;
     }
 
     /**

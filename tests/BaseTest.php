@@ -174,4 +174,38 @@ abstract class BaseTest extends TestCase{
             ServiceProvider::class
         ];
     }
+
+    /**
+     * @param $model
+     * @return \Mockery\Mock
+     */
+    protected function getMockQuery($model)
+    {
+        if($model == 'Theme') {
+            $model = new Models\Theme();
+        } else {
+            $model = new Models\Category();
+        }
+
+        $query = \Mockery::mock('\Illuminate\Database\Eloquent\Builder')
+            ->makePartial();
+
+        $query->shouldReceive('getModel')
+            ->andReturn($model);
+
+        return $query;
+    }
+
+
+    /**
+     * @return \Mockery\MockInterface
+     */
+    protected function getSubQueryMock()
+    {
+        return \Mockery::mock('\Illuminate\Database\Eloquent\Builder')
+            ->shouldReceive('where')
+            ->with('name', '=', 'Theme 1')
+            ->times(1)
+            ->getMock();
+    }
 }

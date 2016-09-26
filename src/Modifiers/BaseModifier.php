@@ -83,6 +83,16 @@ abstract class BaseModifier implements EqmCanModify
     }
 
     /**
+     * @param $name
+     * @throws \Exception
+     */
+    protected function throwInvalidRelationException($name)
+    {
+        throw new \Exception('The ' . $name . ' relation does not exist.');
+    }
+
+
+    /**
      * @param $class
      * @throws \Exception
      */

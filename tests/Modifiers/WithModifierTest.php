@@ -88,9 +88,9 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
 
         $modifier = $this->getFilterModifierInstance($query, $data);
 
-        $modifier->modify($query);
+        $this->setExpectedException(Exception::class);
 
-        $this->assertEquals([], $query->getEagerLoads());
+        $modifier->modify($query);
     }
 
     public function test_valid_with_filters_adds_sub_query()
@@ -193,7 +193,7 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
         $result = $modifier->modify($query);
     }
 
-    public function test_relations_are_actually_filtered()
+    public function test_integration_returns_expected()
     {
         $this->populateDatabase();
 
@@ -248,26 +248,7 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
             ->getMock();
     }
 
-    /**
-     * @param $model
-     * @return \Mockery\Mock
-     */
-    protected function getMockQuery($model)
-    {
-        if($model == 'Theme') {
-            $model = new Models\Theme();
-        } else {
-            $model = new Models\Category();
-        }
 
-        $query = Mockery::mock('\Illuminate\Database\Eloquent\Builder')
-            ->makePartial();
-
-        $query->shouldReceive('getModel')
-            ->andReturn($model);
-
-        return $query;
-    }
 
     protected function getMockRelation()
     {
@@ -277,15 +258,4 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
         return $query;
     }
 
-    /**
-     * @return \Mockery\MockInterface
-     */
-    protected function getSubQueryMock()
-    {
-        return \Mockery::mock('\Illuminate\Database\Eloquent\Builder')
-            ->shouldReceive('where')
-            ->with('name', '=', 'Theme 1')
-            ->times(1)
-            ->getMock();
-    }
 }
