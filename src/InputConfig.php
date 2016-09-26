@@ -55,6 +55,13 @@ class InputConfig {
     protected $page = 'page';
 
     /**
+     * The name of the with parameter.
+     *
+     * @var string
+     */
+    protected $with = 'with';
+
+    /**
      * @var string
      */
     protected $filterType = 'andWhere';
@@ -223,7 +230,23 @@ class InputConfig {
     }
 
     /**
-     * @param array $filterableFields
+     * @return string
+     */
+    public function getWith()
+    {
+        return $this->with;
+    }
+
+    /**
+     * @param string $with
+     */
+    public function setWith($with)
+    {
+        $this->with = $with;
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
      */
     public function setFilterableFields(\Illuminate\Database\Eloquent\Builder $builder)
     {
