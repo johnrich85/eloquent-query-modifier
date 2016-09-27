@@ -150,6 +150,31 @@ class HasModifierTest extends Johnrich85\Tests\BaseTest {
         $modifier->modify($query);
     }
 
+    public function test_zero_value_does_not_throw_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'column' => 'name',
+                    'value' => 0
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $result = $modifier->modify($query);
+
+        $wheres = $result->getQuery()->wheres;
+
+        $this->assertEquals('Exists', $wheres[0]['type']);
+        $this->assertEquals('themes', $wheres[0]['query']->from);
+    }
+
     public function test_missing_value_in_query_throws_exception()
     {
         $model = new Models\Category();

@@ -40,7 +40,7 @@ class FilterSubQuery extends FilterQuery
      */
     public function validate()
     {
-        if(empty($this->column) || $this->value == null) {
+        if(empty($this->column) || $this->value === null) {
            return false;
         }
 

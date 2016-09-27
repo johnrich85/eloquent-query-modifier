@@ -14,7 +14,7 @@ class FilterQuery
     /**
      * @var string
      */
-    public $value = '';
+    public $value;
 
     /**
      * FilterQuery constructor.
