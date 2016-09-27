@@ -1,6 +1,13 @@
 <?php namespace Johnrich85\EloquentQueryModifier;
 
 use Illuminate\Support\Facades\DB;
+use Johnrich85\EloquentQueryModifier\Modifiers\FieldSelectionModifier;
+use Johnrich85\EloquentQueryModifier\Modifiers\FilterModifier;
+use Johnrich85\EloquentQueryModifier\Modifiers\HasModifier;
+use Johnrich85\EloquentQueryModifier\Modifiers\PagingModifier;
+use Johnrich85\EloquentQueryModifier\Modifiers\SearchModifier;
+use Johnrich85\EloquentQueryModifier\Modifiers\SortModifier;
+use Johnrich85\EloquentQueryModifier\Modifiers\WithModifier;
 
 class InputConfig {
 
@@ -79,11 +86,13 @@ class InputConfig {
      * @var array
      */
     protected $modifiers = array(
-        '\Johnrich85\EloquentQueryModifier\Modifiers\FieldSelectionModifier',
-        '\Johnrich85\EloquentQueryModifier\Modifiers\FilterModifier',
-        '\Johnrich85\EloquentQueryModifier\Modifiers\SortModifier',
-        '\Johnrich85\EloquentQueryModifier\Modifiers\PagingModifier',
-        '\Johnrich85\EloquentQueryModifier\Modifiers\SearchModifier'
+        FieldSelectionModifier::class,
+        FilterModifier::class,
+        SortModifier::class,
+        PagingModifier::class,
+        SearchModifier::class,
+        WithModifier::class,
+        HasModifier::class
     );
 
     /**
