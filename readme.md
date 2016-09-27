@@ -78,6 +78,10 @@ $modifier = Johnrich85\EloquentQueryModifier\EloquentQueryModifier($config, $fac
 ##Natively supports the following filters/modifiers
 **Sort:** ?sort=-priority,created_at
 
+**Eager load:** ?with=relation1, relation2
+
+**WhereHas:** ?has[column]=name&has[operator]===&has[value]=Test123
+
 **Field Filter:** ?fieldName=value
 
 **Field selection:** ?fields=id,name, description

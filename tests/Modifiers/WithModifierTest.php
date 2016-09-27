@@ -182,9 +182,11 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
 
         $data = [
             'with' => [
-                'themes' => function($q) {
-                    $q->where('name', '=', 'Theme 1');
-                }
+                'themes' => [
+                    'callback' => function($q) {
+                        $q->where('name', '=', 'Theme 1');
+                    }
+                ]
             ]
         ];
 
