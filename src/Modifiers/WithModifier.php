@@ -35,10 +35,10 @@ class WithModifier extends BaseModifier
      */
     protected function addEagerLoads($eagerLoads)
     {
-        foreach($eagerLoads as $name=>$query) {
+        foreach ($eagerLoads as $name => $query) {
             try {
                 $this->builder->getRelation($name);
-            } catch(\BadMethodCallException $e) {
+            } catch (\BadMethodCallException $e) {
                 $this->throwInvalidRelationException($name);
             }
 
@@ -52,21 +52,26 @@ class WithModifier extends BaseModifier
      */
     protected function addEagerLoad($name, $query)
     {
-        if(count($query) == 0) {
+        if (count($query) == 0) {
             $this->builder->with($name);
-        } else {
-            if(empty($query['callback']) || !is_callable($query['callback'])) {
-                $subQuery = new FilterSubQuery($query);
+            return;
+        }
 
-                $query = function($q) use ($subQuery) {
-                    $q->where($subQuery->column, $subQuery->operator,  $subQuery->value);
-                };
-            } else {
-                $query = $query['callback'];
+        if (empty($query['callback']) || !is_callable($query['callback'])) {
+            $subQuery = new FilterSubQuery($query);
+
+            if(!$subQuery->validate()) {
+                $this->throwInvalidSubQueryException($name);
             }
 
-            $this->builder->with([$name => $query]);
+            $query = function ($q) use ($subQuery) {
+                $q->where($subQuery->column, $subQuery->operator, $subQuery->value);
+            };
+        } else {
+            $query = $query['callback'];
         }
+
+        $this->builder->with([$name => $query]);
     }
 
     /**
@@ -82,9 +87,11 @@ class WithModifier extends BaseModifier
 
         $fields = $this->data[$withParameter];
 
-        if(!is_array($fields)) {
-            $fields = json_decode($fields, true);
+        if (is_array($fields)) {
+            return $fields;
         }
+
+        $fields = $this->parseString($fields);
 
         return $fields;
     }

@@ -1,7 +1,6 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
 use Johnrich85\EloquentQueryModifier\FilterCountQuery;
-use Johnrich85\EloquentQueryModifier\FilterQuery;
 use Johnrich85\EloquentQueryModifier\FilterSubQuery;
 
 /**
@@ -56,7 +55,7 @@ class HasModifier extends BaseModifier
         if(count($query) == 0) {
             $this->builder->has($name, $countQuery->operator, (int) $countQuery->value);
         } else {
-            $query = $this->buildSubQuery($query);
+            $query = $this->buildSubQuery($name, $query);
 
             $this->builder->whereHas($name, $query, $countQuery->operator, (int) $countQuery->value);
         }
@@ -66,10 +65,14 @@ class HasModifier extends BaseModifier
      * @param $query
      * @return \Closure
      */
-    protected function buildSubQuery($query)
+    protected function buildSubQuery($name, $query)
     {
         if(empty($query['callback']) || !is_callable($query['callback'])) {
             $subQuery = new FilterSubQuery($query);
+
+            if(!$subQuery->validate()) {
+                $this->throwInvalidSubQueryException($name);
+            }
 
             $query = function($q) use ($subQuery) {
                 $q->where($subQuery->column, $subQuery->operator,  $subQuery->value);
@@ -114,9 +117,11 @@ class HasModifier extends BaseModifier
 
         $fields = $this->data[$withParameter];
 
-        if(!is_array($fields) ) {
-            $fields = json_decode($fields, true);
+        if (is_array($fields)) {
+            return $fields;
         }
+
+        $fields = $this->parseString($fields);
 
         return $fields;
     }

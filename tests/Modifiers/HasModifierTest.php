@@ -62,6 +62,114 @@ class HasModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals('themes', $wheres[0]['query']->from);
     }
 
+    public function test_valid_string_returns_builder()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'has' => 'themes'
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+
+        $wheres = $result->getQuery()->wheres;
+
+        $this->assertEquals('Exists', $wheres[0]['type']);
+        $this->assertEquals('themes', $wheres[0]['query']->from);
+    }
+
+    public function test_valid_string__multi_returns_builder()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'has' => 'themes, book'
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+
+        $wheres = $result->getQuery()->wheres;
+
+        $this->assertEquals('Exists', $wheres[0]['type']);
+        $this->assertEquals('themes', $wheres[0]['query']->from);
+    }
+
+
+    public function test_no_column_in_query_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'value' => 'No column provided.'
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $this->setExpectedException(Exception::class);
+
+        $modifier->modify($query);
+    }
+
+    public function test_empty_column_in_query_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'column' => '',
+                    'value' => 'No column provided.'
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $this->setExpectedException(Exception::class);
+
+        $modifier->modify($query);
+    }
+
+    public function test_missing_value_in_query_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'column' => 'name'
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $this->setExpectedException(Exception::class);
+
+        $modifier->modify($query);
+    }
 
     public function test_with_count_returns_builder()
     {

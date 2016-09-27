@@ -41,6 +41,42 @@ abstract class BaseModifier implements EqmCanModify
     }
 
     /**
+     * Decodes json if possible, else explodes string.
+     *
+     * @param $fields
+     * @return array|mixed|trim
+     */
+    protected function parseString($fields)
+    {
+        $json = json_decode($fields, true);
+
+        if ($json != null) {
+            return $json;
+        }
+
+        return $this->commaListToArray($fields);
+    }
+
+    /**
+     * Transforms comma separated list to array.
+     *
+     * @param $fields
+     * @return array
+     */
+    protected function commaListToArray($fields)
+    {
+        $payload = [];
+
+        $names = explode(',', $fields);
+
+        foreach($names as $relationName) {
+            $payload[trim($relationName)] = [];
+        }
+
+        return $payload;
+    }
+
+    /**
      * Given a comma delimited string, explodes
      * to array.
      *
@@ -91,6 +127,14 @@ abstract class BaseModifier implements EqmCanModify
         throw new \Exception('The ' . $name . ' relation does not exist.');
     }
 
+    /**
+     * @param $name
+     * @throws \Exception
+     */
+    protected function throwInvalidSubQueryException($name)
+    {
+        throw new \Exception('The parameters provided for ' . $name . ' are invalid. Please ensure a column and value are provided.');
+    }
 
     /**
      * @param $class

@@ -31,4 +31,19 @@ class FilterSubQuery extends FilterQuery
     public function setColumn($value) {
         $this->column = $value;
     }
+
+    /**
+     * Determines whether or not the query
+     * is valid.
+     *
+     * @return bool
+     */
+    public function validate()
+    {
+        if(empty($this->column) || $this->value == null) {
+           return false;
+        }
+
+        return true;
+    }
 }

@@ -38,7 +38,7 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals([], $query->getEagerLoads());
     }
 
-    public function test_valid_with_returns_builder()
+    public function test_valid_array_returns_builder()
     {
         $model = new Models\Category();
 
@@ -57,6 +57,126 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
 
         $this->assertEquals(true, array_key_exists('themes', $query->getEagerLoads()));
+    }
+
+    public function test_no_column_in_query_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'with' => [
+                'themes' => [
+                    'value' => 'No column provided.'
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $this->setExpectedException(Exception::class);
+
+       $modifier->modify($query);
+    }
+
+    public function test_empty_column_in_query_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'with' => [
+                'themes' => [
+                    'column' => '',
+                    'value' => 'No column provided.'
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $this->setExpectedException(Exception::class);
+
+        $modifier->modify($query);
+    }
+
+    public function test_missing_value_in_query_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'with' => [
+                'themes' => [
+                    'column' => 'name'
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $this->setExpectedException(Exception::class);
+
+        $modifier->modify($query);
+    }
+
+    public function test_valid_string_returns_builder()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'with' => 'themes'
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+
+        $this->assertEquals(true, array_key_exists('themes', $query->getEagerLoads()));
+    }
+
+    public function test_valid_string_multi_returns_builder()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'with' => 'themes, book'
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $result = $modifier->modify($query);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $result);
+
+        $this->assertEquals(true, array_key_exists('themes', $query->getEagerLoads()));
+        $this->assertEquals(true, array_key_exists('book', $query->getEagerLoads()));
+    }
+
+    public function test_invalid_string_throws_exception()
+    {
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'with' => 'themes, ,book'
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data);
+
+        $this->setExpectedException(Exception::class);
+
+        $result = $modifier->modify($query);
     }
 
     public function test_valid_json_with_returns_builder() {
