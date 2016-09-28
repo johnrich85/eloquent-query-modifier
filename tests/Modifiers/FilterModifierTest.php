@@ -112,6 +112,35 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals(1, count($query->get()));
     }
 
+    public function test_array_filter() {
+        $this->populateDatabase();
+
+        $model = new Models\Category();
+
+        $query = $model->query();
+
+        $data = [
+            'name' => [
+                'operator' => '==',
+                'value' => 'Cat 1'
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query, $data, null);
+
+        $result = $modifier->modify($query);
+        $wheres = $result->getQuery()->wheres;
+
+        $this->assertEquals(1, count($wheres));
+
+        $this->assertEquals('name', $wheres[0]['column']);
+        $this->assertEquals('=', $wheres[0]['operator']);
+        $this->assertEquals('Cat 1', $wheres[0]['value']);
+        $this->assertEquals('and', $wheres[0]['boolean']);
+
+        $this->assertEquals(1, count($query->get()));
+    }
+
     public function test_object_filter_multi() {
         $this->populateDatabase();
 
@@ -386,27 +415,6 @@ class FilterModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals('and', $wheres[0]['boolean']);
 
         $this->assertEquals(1, count($query->get()));
-    }
-
-    public function test_array_instead_of_object() {
-        $this->populateDatabase();
-
-        $model = new Models\Category();
-        $query = $model->query();
-
-        $queryObject = new \Johnrich85\EloquentQueryModifier\FilterQuery();
-        $queryObject->operator = '==';
-        $queryObject->value = 'Cat 1';
-
-        $data = [
-            'name' => (array) $queryObject
-        ];
-
-        $modifier = $this->getFilterModifierInstance($query, $data, null);
-
-        $this->setExpectedException(Exception::class);
-
-        $modifier->modify($query);
     }
 
     protected function getFilterModifierInstance($query, $data, $config = null, $type = 'and')

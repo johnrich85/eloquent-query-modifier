@@ -23,7 +23,8 @@ class FilterModifier extends BaseModifier
      * @param \Illuminate\Database\Eloquent\Builder $builder
      * @param InputConfig $config
      */
-    public function __construct(array $data, \Illuminate\Database\Eloquent\Builder $builder, InputConfig $config) {
+    public function __construct(array $data, \Illuminate\Database\Eloquent\Builder $builder, InputConfig $config)
+    {
         parent::__construct($data, $builder, $config);
 
         $this->filterType = $this->config->getFilterType();
@@ -40,6 +41,19 @@ class FilterModifier extends BaseModifier
             return $this->builder;
         };
 
+        $this->addWheres($fields);
+
+        return $this->builder;
+    }
+
+    /**
+     * Loops data, adding where filters
+     * to columns.
+     *
+     * @param $fields
+     */
+    protected function addWheres($fields)
+    {
         foreach ($fields as $field) {
             if (empty($this->data[$field])) {
                 continue;
@@ -47,15 +61,28 @@ class FilterModifier extends BaseModifier
 
             $data = $this->data[$field];
 
-            if (is_array($data)) {
+            if ($this->detectWhereInFilter($data)) {
                 $this->addWhereInFilter($field, $data);
                 continue;
             }
 
             $this->addWhereFilter($field, $data);
         }
+    }
 
-        return $this->builder;
+    /**
+     * @param $data
+     * @return bool
+     */
+    protected function detectWhereInFilter($data)
+    {
+        if (!is_array($data) || (array_key_exists('value', $data) ||
+                array_key_exists('operator', $data))
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -83,6 +110,10 @@ class FilterModifier extends BaseModifier
     {
         $operator = '=';
 
+        if (is_array($value)) {
+            $value = new FilterQuery($value);
+        }
+
         if (is_object($value)) {
             $operator = $value->operator;
             $value = $value->value;
@@ -109,6 +140,7 @@ class FilterModifier extends BaseModifier
     {
         if ($this->isInclude($operator)) {
             $this->builder = $this->builder->whereIn($field, $value);
+
             return;
         } elseif ($this->isExclude($operator)) {
             $this->builder = $this->builder->whereNotIn($field, $value);
@@ -126,7 +158,7 @@ class FilterModifier extends BaseModifier
      */
     protected function addStandardWhere($field, $operator, $value)
     {
-        if($operator == '==') {
+        if ($operator == '==') {
             $operator = '=';
         }
 
@@ -212,9 +244,9 @@ class FilterModifier extends BaseModifier
      */
     protected function addWhereInFilter($field, array $data)
     {
-        if(array_key_exists('operator', $data) || array_key_exists('value', $data)) {
+        if (array_key_exists('operator', $data) || array_key_exists('value', $data)) {
             $error = 'Field value must be an object, not an array. Arrays are supported but only for WhereIn queries.';
-            $error.= 'Please refer to documentation for further info.';
+            $error .= 'Please refer to documentation for further info.';
 
             throw new Exception($error);
         }

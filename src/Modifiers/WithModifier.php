@@ -54,13 +54,14 @@ class WithModifier extends BaseModifier
     {
         if (count($query) == 0) {
             $this->builder->with($name);
+
             return;
         }
 
         if (empty($query['callback']) || !is_callable($query['callback'])) {
             $subQuery = new FilterSubQuery($query);
 
-            if(!$subQuery->validate()) {
+            if (!$subQuery->validate()) {
                 $this->throwInvalidSubQueryException($name);
             }
 

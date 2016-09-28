@@ -33,10 +33,10 @@ class HasModifier extends BaseModifier
      */
     protected function addHasFilters($hasQueries)
     {
-        foreach($hasQueries as $name=>$query) {
+        foreach ($hasQueries as $name => $query) {
             try {
                 $this->builder->getRelation($name);
-            } catch(\BadMethodCallException $e) {
+            } catch (\BadMethodCallException $e) {
                 $this->throwInvalidRelationException($name);
             }
 
@@ -52,12 +52,12 @@ class HasModifier extends BaseModifier
     {
         $countQuery = $this->pluckCountQuery($query);
 
-        if(count($query) == 0) {
-            $this->builder->has($name, $countQuery->operator, (int) $countQuery->value);
+        if (count($query) == 0) {
+            $this->builder->has($name, $countQuery->operator, (int)$countQuery->value);
         } else {
             $query = $this->buildSubQuery($name, $query);
 
-            $this->builder->whereHas($name, $query, $countQuery->operator, (int) $countQuery->value);
+            $this->builder->whereHas($name, $query, $countQuery->operator, (int)$countQuery->value);
         }
     }
 
@@ -67,15 +67,15 @@ class HasModifier extends BaseModifier
      */
     protected function buildSubQuery($name, $query)
     {
-        if(empty($query['callback']) || !is_callable($query['callback'])) {
+        if (empty($query['callback']) || !is_callable($query['callback'])) {
             $subQuery = new FilterSubQuery($query);
 
-            if(!$subQuery->validate()) {
+            if (!$subQuery->validate()) {
                 $this->throwInvalidSubQueryException($name);
             }
 
-            $query = function($q) use ($subQuery) {
-                $q->where($subQuery->column, $subQuery->operator,  $subQuery->value);
+            $query = function ($q) use ($subQuery) {
+                $q->where($subQuery->column, $subQuery->operator, $subQuery->value);
             };
         } else {
             $query = $query['callback'];
@@ -91,7 +91,7 @@ class HasModifier extends BaseModifier
      */
     protected function pluckCountQuery(&$query)
     {
-        if(empty($query['count'])) {
+        if (empty($query['count'])) {
             $values = [];
         } else {
             $values = $query['count'];
