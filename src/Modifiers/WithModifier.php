@@ -52,7 +52,7 @@ class WithModifier extends BaseModifier
      */
     protected function addEagerLoad($name, $query)
     {
-        if (count($query) == 0) {
+        if (count($query) == 0 || $query == $name) {
             $this->builder->with($name);
 
             return;

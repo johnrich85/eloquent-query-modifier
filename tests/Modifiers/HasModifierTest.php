@@ -46,7 +46,8 @@ class HasModifierTest extends Johnrich85\Tests\BaseTest {
 
         $data = [
             'has' => [
-                'themes' => []
+                'themes' => [],
+                'book' => 'book'
             ]
         ];
 

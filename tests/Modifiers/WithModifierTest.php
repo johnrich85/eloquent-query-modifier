@@ -46,7 +46,8 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
 
         $data = [
             'with' => [
-                'themes' => []
+                'themes' => [],
+                'book' => 'book'
             ]
         ];
 

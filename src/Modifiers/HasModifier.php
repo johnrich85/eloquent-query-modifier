@@ -52,7 +52,7 @@ class HasModifier extends BaseModifier
     {
         $countQuery = $this->pluckCountQuery($query);
 
-        if (count($query) == 0) {
+        if (count($query) == 0 || $name == $query) {
             $this->builder->has($name, $countQuery->operator, (int)$countQuery->value);
         } else {
             $query = $this->buildSubQuery($name, $query);
@@ -95,11 +95,10 @@ class HasModifier extends BaseModifier
             $values = [];
         } else {
             $values = $query['count'];
+            unset($query['count']);
         }
 
         $countQuery = new FilterCountQuery($values);
-
-        unset($query['count']);
 
         return $countQuery;
     }
