@@ -86,13 +86,13 @@ class InputConfig {
      * @var array
      */
     protected $modifiers = array(
+        WithModifier::class,
+        HasModifier::class
         FieldSelectionModifier::class,
         FilterModifier::class,
         SortModifier::class,
         PagingModifier::class,
         SearchModifier::class,
-        WithModifier::class,
-        HasModifier::class
     );
 
     /**
