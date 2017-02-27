@@ -1,5 +1,6 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
+use Johnrich85\EloquentQueryModifier\FilterSubQuery;
 use Johnrich85\EloquentQueryModifier\InputConfig;
 use Johnrich85\EloquentQueryModifier\Modifiers\Contract\EqmCanModify;
 
@@ -91,6 +92,35 @@ abstract class BaseModifier implements EqmCanModify
         );
 
         return $payload;
+    }
+
+
+    /**
+     * @param $data
+     * @param $queryBuilder
+     * @param $config
+     * @return FilterModifier
+     */
+    protected function buildFilterModifier($data, $queryBuilder, $config)
+    {
+        return $modifier = new FilterModifier($data, $queryBuilder, $config);
+    }
+
+    /**
+     * Returns sub query in format that can be injected
+     * into Modifiers.
+     *
+     * @param FilterSubQuery $subQuery
+     * @return array
+     */
+    protected function subQueryToArray(FilterSubQuery $subQuery)
+    {
+        return [
+            $subQuery->column => [
+                'operator' => $subQuery->operator,
+                'value' => $subQuery->value
+            ]
+        ];
     }
 
     /**

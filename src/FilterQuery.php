@@ -23,9 +23,9 @@ class FilterQuery
      */
     public function __construct(array $values = [])
     {
-        if(isset($values['operator'])) {
-            $this->setOperator($values['operator']);
-        }
+        $operator = isset($values['operator']) ? $values['operator'] : null;
+
+        $this->setOperator($operator);
 
         if(isset($values['value'])) {
             $this->setValue($values['value']);
@@ -37,7 +37,7 @@ class FilterQuery
      * @param $value
      */
     public function setOperator($value) {
-        if($value == '==') {
+        if($value == '==' || empty($value)) {
             $value = '=';
         }
 

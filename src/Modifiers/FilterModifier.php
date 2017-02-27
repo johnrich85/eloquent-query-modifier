@@ -108,27 +108,45 @@ class FilterModifier extends BaseModifier
      */
     protected function addWhereFilter($field, $value)
     {
-        $operator = '=';
+        $query = $this->parseQuery($value);
 
-        if (is_array($value)) {
-            $value = new FilterQuery($value);
+        if ($query->value !== null) {
+            $this->addWhereType($field, $query->operator, $query->value);
         }
+    }
 
-        if (is_object($value)) {
-            $operator = $value->operator;
-            $value = $value->value;
+    /**
+     * Returns FilterQuery object.
+     *
+     * @param $value
+     * @return FilterQuery|null
+     */
+    protected function parseQuery($value)
+    {
+        $payload = null;
+
+        if($value instanceof FilterQuery) {
+            $payload =  $value;
+        } elseif  (is_array($value)) {
+            $payload = new FilterQuery($value);
         } else {
             $json = $this->jsonDecode($value);
 
             if ($json) {
-                $value = $this->getJsonValue($json);
-                $operator = $this->getJsonOperator($json);
+                $values = [
+                    'value' => $this->getJsonValue($json),
+                    'operator' => $this->getJsonOperator($json)
+                ];
+            } else {
+                $values = [
+                    'value' => $value
+                ];
             }
+
+            $payload = new FilterQuery($values);
         }
 
-        if ($value !== null) {
-            $this->addWhereType($field, $operator, $value);
-        }
+        return $payload;
     }
 
     /**

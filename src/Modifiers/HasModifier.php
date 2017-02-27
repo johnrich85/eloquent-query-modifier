@@ -74,8 +74,12 @@ class HasModifier extends BaseModifier
                 $this->throwInvalidSubQueryException($name);
             }
 
-            $query = function ($q) use ($subQuery) {
-                $q->where($subQuery->column, $subQuery->operator, $subQuery->value);
+            $data = $this->subQueryToArray($subQuery);
+
+            $query = function ($q) use ($data) {
+                $modifier = $this->buildFilterModifier($data, $q, $this->config);
+
+                $modifier->modify($q);
             };
         } else {
             $query = $query['callback'];
@@ -83,7 +87,6 @@ class HasModifier extends BaseModifier
 
         return $query;
     }
-
 
     /**
      * @param $query

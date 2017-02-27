@@ -446,6 +446,59 @@ class HasModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals(1, count($result2));
     }
 
+    public function test_integration_returns_expected_with_include()
+    {
+        $this->populateDatabase();
+
+        $model1 = Models\Category::find(1);
+        $query1 = $model1->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'column' => 'name',
+                    'operator' => 'include',
+                    'value' => ['Theme 1']
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query1, $data);
+
+        $result1 = $modifier->modify($query1);
+
+        $result1 = $result1->first();
+
+        $this->assertEquals(1, count($result1));
+    }
+
+    public function test_integration_sub_query_supports_invalid_fields()
+    {
+        $this->populateDatabase();
+
+        $model1 = Models\Category::find(1);
+        $query1 = $model1->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'column' => 'i_dont_exist',
+                    'operator' => 'include',
+                    'value' => ['Theme 1']
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query1, $data);
+
+        $result1 = $modifier->modify($query1);
+
+        $result1 = $result1->first();
+
+        $this->assertEquals(1, count($result1));
+    }
+
+
     public function test_integration_returns_expected_with_multiple()
     {
         $this->populateDatabase();
