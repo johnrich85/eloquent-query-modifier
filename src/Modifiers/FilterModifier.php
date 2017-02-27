@@ -2,6 +2,7 @@
 
 use Johnrich85\EloquentQueryModifier\FilterQuery;
 use Johnrich85\EloquentQueryModifier\InputConfig;
+use Johnrich85\EloquentQueryModifier\InputDecoders\JsonDecoder;
 use Mockery\CountValidator\Exception;
 
 class FilterModifier extends BaseModifier
@@ -212,19 +213,15 @@ class FilterModifier extends BaseModifier
      */
     protected function jsonDecode($value)
     {
-        if (!is_string($value)) {
+        $decoder = new JsonDecoder();
+
+        $decoder->decode($value);
+
+        if (!$decoder->success()) {
             return false;
         }
 
-        $json = json_decode($value, true);
-
-        $isJson = is_array($json) && (json_last_error() == JSON_ERROR_NONE);
-
-        if (!$isJson) {
-            return false;
-        }
-
-        return $json;
+        return $decoder->getData();
     }
 
     /**
