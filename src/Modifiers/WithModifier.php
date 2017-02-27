@@ -65,9 +65,7 @@ class WithModifier extends BaseModifier
                 $this->throwInvalidSubQueryException($name);
             }
 
-            $query = function ($q) use ($subQuery) {
-                $q->where($subQuery->column, $subQuery->operator, $subQuery->value);
-            };
+            $query = $this->buildSubQuery($name, $query);
         } else {
             $query = $query['callback'];
         }

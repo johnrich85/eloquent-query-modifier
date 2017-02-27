@@ -351,6 +351,76 @@ class WithModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals(1, count($result2->themes));
     }
 
+    public function test_integration_returns_expected_with_include()
+    {
+        $this->populateDatabase();
+
+        $model1 = Models\Category::find(1);
+        $query1 = $model1->query();
+
+        $model2 = Models\Category::find(1);
+        $query2 = $model2->query();
+
+        $data = [
+            'with' => [
+                'themes' => [
+                    'column' => 'name',
+                    'operator' => 'include',
+                    'value' => ['Not here']
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query1, $data);
+
+        $data['with']['themes']['value'][] = ['Theme 1'];
+        $modifier2 = $this->getFilterModifierInstance($query2, $data);
+
+        $result1 = $modifier->modify($query1);
+        $result2 = $modifier2->modify($query2);
+
+        $result1 = $result1->first();
+        $result2 = $result2->first();
+
+        $this->assertEquals(0, count($result1->themes));
+        $this->assertEquals(1, count($result2->themes));
+    }
+
+    public function test_integration_returns_expected_with_exclude()
+    {
+        $this->populateDatabase();
+
+        $model1 = Models\Category::find(1);
+        $query1 = $model1->query();
+
+        $model2 = Models\Category::find(1);
+        $query2 = $model2->query();
+
+        $data = [
+            'with' => [
+                'themes' => [
+                    'column' => 'name',
+                    'operator' => 'exclude',
+                    'value' => ['Not here']
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query1, $data);
+
+        $data['with']['themes']['value'][] = ['Theme 1'];
+        $modifier2 = $this->getFilterModifierInstance($query2, $data);
+
+        $result1 = $modifier->modify($query1);
+        $result2 = $modifier2->modify($query2);
+
+        $result1 = $result1->first();
+        $result2 = $result2->first();
+
+        $this->assertEquals(1, count($result1->themes));
+        $this->assertEquals(0, count($result2->themes));
+    }
+
     protected function getFilterModifierInstance($query, $data, $config = null)
     {
         if(!$config) {

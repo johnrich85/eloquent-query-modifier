@@ -1,5 +1,6 @@
 <?php namespace Johnrich85\EloquentQueryModifier\Modifiers;
 
+use Illuminate\Database\Eloquent\Builder;
 use Johnrich85\EloquentQueryModifier\FilterSubQuery;
 use Johnrich85\EloquentQueryModifier\InputConfig;
 use Johnrich85\EloquentQueryModifier\Modifiers\Contract\EqmCanModify;
@@ -121,6 +122,40 @@ abstract class BaseModifier implements EqmCanModify
                 'value' => $subQuery->value
             ]
         ];
+    }
+
+    /**
+     * Builds a sub query using an instance
+     * of FilterModifier.
+     *
+     * @param $query
+     * @return \Closure
+     */
+    protected function buildSubQuery($name, $query)
+    {
+        if (empty($query['callback']) || !is_callable($query['callback'])) {
+            $subQuery = new FilterSubQuery($query);
+
+            if (!$subQuery->validate()) {
+                $this->throwInvalidSubQueryException($name);
+            }
+
+            $data = $this->subQueryToArray($subQuery);
+
+            $query = function ($q) use ($data) {
+                if(!$q instanceof Builder) {
+                    $q = $q->getQuery();
+                }
+
+                $modifier = $this->buildFilterModifier($data, $q, $this->config);
+
+                $modifier->modify($q);
+            };
+        } else {
+            $query = $query['callback'];
+        }
+
+        return $query;
     }
 
     /**

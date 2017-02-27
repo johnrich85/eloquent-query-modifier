@@ -9,10 +9,20 @@ class FilterCountQuery extends FilterQuery
     /**
      * @var string
      */
-    public $operator = '>=';
+    public $value = '1';
 
     /**
-     * @var string
+     * Instantiates FilterCountQuery, defaulting
+     * operator to >=.
+     *
+     * @param array $values
      */
-    public $value = '1';
+    public function __construct(array $values = [])
+    {
+        if(!isset($values['operator'])) {
+            $values['operator'] = '>=';
+        }
+
+        parent::__construct($values);
+    }
 }

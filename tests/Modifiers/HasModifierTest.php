@@ -458,7 +458,7 @@ class HasModifierTest extends Johnrich85\Tests\BaseTest {
                 'themes' => [
                     'column' => 'name',
                     'operator' => 'include',
-                    'value' => ['Theme 1']
+                    'value' => ['Theme 1', 'i dont exist']
                 ]
             ]
         ];
@@ -470,6 +470,32 @@ class HasModifierTest extends Johnrich85\Tests\BaseTest {
         $result1 = $result1->first();
 
         $this->assertEquals(1, count($result1));
+    }
+
+    public function test_integration_returns_expected_with_exclude()
+    {
+        $this->populateDatabase();
+
+        $model1 = Models\Category::find(1);
+        $query1 = $model1->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'column' => 'name',
+                    'operator' => 'exclude',
+                    'value' => ['Theme 1']
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query1, $data);
+
+        $result1 = $modifier->modify($query1);
+
+        $result1 = $result1->first();
+
+        $this->assertEquals(0, count($result1));
     }
 
     public function test_integration_sub_query_supports_invalid_fields()
@@ -498,6 +524,30 @@ class HasModifierTest extends Johnrich85\Tests\BaseTest {
         $this->assertEquals(1, count($result1));
     }
 
+    public function test_integration_sub_query_supports_default_operator()
+    {
+        $this->populateDatabase();
+
+        $model1 = Models\Category::find(1);
+        $query1 = $model1->query();
+
+        $data = [
+            'has' => [
+                'themes' => [
+                    'column' => 'name',
+                    'value' => ['I dont exist']
+                ]
+            ]
+        ];
+
+        $modifier = $this->getFilterModifierInstance($query1, $data);
+
+        $result1 = $modifier->modify($query1);
+
+        $result1 = $result1->first();
+
+        $this->assertEquals(0, count($result1));
+    }
 
     public function test_integration_returns_expected_with_multiple()
     {

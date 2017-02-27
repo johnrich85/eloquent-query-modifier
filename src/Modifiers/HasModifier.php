@@ -10,6 +10,8 @@ use Johnrich85\EloquentQueryModifier\FilterSubQuery;
 class HasModifier extends BaseModifier
 {
     /**
+     * Adds has filters if valid.
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Exception
      */
@@ -29,7 +31,11 @@ class HasModifier extends BaseModifier
     }
 
     /**
-     * @param array $hasQueries
+     * Adds has filters, if all relations
+     * exist. Throws exception if not.
+     *
+     * @param $hasQueries
+     * @throws \Exception
      */
     protected function addHasFilters($hasQueries)
     {
@@ -45,6 +51,9 @@ class HasModifier extends BaseModifier
     }
 
     /**
+     * Adds individual 'has' filter. Supports
+     * basic, or a filter with a sub query.
+     *
      * @param $name
      * @param array|closure $query
      */
@@ -62,35 +71,13 @@ class HasModifier extends BaseModifier
     }
 
     /**
+     * Returns new FilterCountQuery object
+     * and removes count from query params (since
+     * any subsequent usage of params will have
+     * no use for it).
+     *
      * @param $query
-     * @return \Closure
-     */
-    protected function buildSubQuery($name, $query)
-    {
-        if (empty($query['callback']) || !is_callable($query['callback'])) {
-            $subQuery = new FilterSubQuery($query);
-
-            if (!$subQuery->validate()) {
-                $this->throwInvalidSubQueryException($name);
-            }
-
-            $data = $this->subQueryToArray($subQuery);
-
-            $query = function ($q) use ($data) {
-                $modifier = $this->buildFilterModifier($data, $q, $this->config);
-
-                $modifier->modify($q);
-            };
-        } else {
-            $query = $query['callback'];
-        }
-
-        return $query;
-    }
-
-    /**
-     * @param $query
-     * @return FilterCountQuery|Mockery_0_Illuminate_Database_Eloquent_Builder
+     * @return FilterCountQuery
      */
     protected function pluckCountQuery(&$query)
     {
